@@ -43,7 +43,7 @@ public class SequentialAlignment {
 		// If it would
 		// return emptyArray instead
 		try{
-			Math.multiplyExact(sequence1.length+1, sequence2.length+1);
+			//Math.multiplyExact(sequence1.length+1, sequence2.length+1);
 		} catch (ArithmeticException e) {
 			//System.out.println("Caught Exception e");
 			int [][] emptyArray = new int[0][0];
