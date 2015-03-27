@@ -11,9 +11,6 @@ local.properties
 .settings/
 .loadpath
 
-# Java Class Files
-*.class
-
 
 # Package Files 
 *.jar
