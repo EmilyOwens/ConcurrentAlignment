@@ -26,7 +26,7 @@ public class PopulateDatabase
             dbURL = "jdbc:derby:MyDB;";
         }
         createConnection();
-        insertGenes(4, "Test4", "AlsoTestFour");
+        insertGenes(5, "Test5", "AlsoTestFive");
         selectGenes();
         shutdown();
     }
