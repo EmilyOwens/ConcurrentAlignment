@@ -9,7 +9,8 @@ import java.sql.ResultSetMetaData;
 
 public class PopulateDatabase
 {
-    private static String dbURL = "jdbc:derby:MyDB;";
+  
+    private static String dbURL;
     private static String tableName = "dnaseqs.table1";
     // jdbc Connection
     private static Connection conn = null;
@@ -17,6 +18,13 @@ public class PopulateDatabase
 
     public static void main(String[] args)
     {
+        String os = System.getProperty("os.name");
+        if (os.startsWith("Linux")){
+            dbURL = "jdbc:derby:../MyDB;";
+        }
+        else{
+            dbURL = "jdbc:derby:MyDB;";
+        }
         createConnection();
         insertGenes(4, "Test4", "AlsoTestFour");
         selectGenes();
