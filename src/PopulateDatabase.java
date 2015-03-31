@@ -7,9 +7,9 @@ import java.sql.ResultSetMetaData;
 
 
 
-public class Restaurants
+public class PopulateDatabase
 {
-    private static String dbURL = "jdbc:derby:/Users/emilyowens/Desktop/CU Classes/Spring2015/ConcurrentProgramming/ConcurrentAlignment/MyDB;";
+    private static String dbURL = "jdbc:derby:MyDB;";
     private static String tableName = "dnaseqs.table1";
     // jdbc Connection
     private static Connection conn = null;
@@ -18,8 +18,8 @@ public class Restaurants
     public static void main(String[] args)
     {
         createConnection();
-        insertRestaurants(3, "Test3", "AlsoTestThree");
-        selectRestaurants();
+        insertGenes(4, "Test4", "AlsoTestFour");
+        selectGenes();
         shutdown();
     }
     
@@ -38,13 +38,13 @@ public class Restaurants
         }
     }
     
-    private static void insertRestaurants(int id, String restName, String cityName)
+    private static void insertGenes(int id, String geneName, String sequence)
     {
         try
         {
             stmt = conn.createStatement();
             stmt.execute("insert into " + tableName + " values (" +
-                    id + ",'" + restName + "','" + cityName +"')");
+                    id + ",'" + geneName + "','" + sequence +"')");
             stmt.close();
         }
         catch (SQLException sqlExcept)
@@ -53,7 +53,7 @@ public class Restaurants
         }
     }
     
-    private static void selectRestaurants()
+    private static void selectGenes()
     {
         try
         {
@@ -72,9 +72,9 @@ public class Restaurants
             while(results.next())
             {
                 int id = results.getInt(1);
-                String restName = results.getString(2);
-                String cityName = results.getString(3);
-                System.out.println(id + "\t\t" + restName + "\t\t" + cityName);
+                String geneName = results.getString(2);
+                String sequence = results.getString(3);
+                System.out.println(id + "\t\t" + geneName + "\t\t" + sequence);
             }
             results.close();
             stmt.close();
