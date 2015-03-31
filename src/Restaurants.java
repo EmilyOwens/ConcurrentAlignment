@@ -6,10 +6,11 @@ import java.sql.Statement;
 import java.sql.ResultSetMetaData;
 
 
+
 public class Restaurants
 {
-    private static String dbURL = "jdbc:derby:DNASequences;create=true;username=user;password=password1";
-    private static String tableName = "table1";
+    private static String dbURL = "jdbc:derby:/Users/emilyowens/Desktop/CU Classes/Spring2015/ConcurrentProgramming/ConcurrentAlignment/MyDB;";
+    private static String tableName = "dnaseqs.table1";
     // jdbc Connection
     private static Connection conn = null;
     private static Statement stmt = null;
@@ -17,7 +18,7 @@ public class Restaurants
     public static void main(String[] args)
     {
         createConnection();
-        insertRestaurants(5, "LaVals", "Berkeley");
+        insertRestaurants(3, "Test3", "AlsoTestThree");
         selectRestaurants();
         shutdown();
     }
@@ -28,6 +29,7 @@ public class Restaurants
         {
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
             //Get a connection
+        	//EmbeddedDriver driver = new EmbeddedDriver();
             conn = DriverManager.getConnection(dbURL); 
         }
         catch (Exception except)
@@ -41,7 +43,6 @@ public class Restaurants
         try
         {
             stmt = conn.createStatement();
-            stmt.execute("create table dnaseqs.table1(id INTEGER NOT NULL,geneName VARCHAR(20) NOT NULL,sequence VARCHAR(20) NOT NULL,PRIMARY KEY (id))");
             stmt.execute("insert into " + tableName + " values (" +
                     id + ",'" + restName + "','" + cityName +"')");
             stmt.close();

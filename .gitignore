@@ -16,9 +16,14 @@ local.properties
 
 # Package Files 
 *.jar
-!lib/*.jar
 *.war
 *.ear
+
+# Include derby jar files
+!lib/*.jar
+
+# Derby error log
+derby.log
 
 # Eclipse Core
 .project

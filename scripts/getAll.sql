@@ -1,0 +1,1 @@
+select * from dnaseqs.table1;
