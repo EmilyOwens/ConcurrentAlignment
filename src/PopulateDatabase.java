@@ -41,7 +41,7 @@ public class PopulateDatabase
         for(int i=1; i<=100; i++)
         {
             name = "Gene" + i;
-            insertGenes(i, name, randomString(20000));
+            insertGenes(i, name, randomString(5000+rnd.nextInt(15000)));
         }
         //selectGenes();
         shutdown();
