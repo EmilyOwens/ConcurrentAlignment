@@ -196,7 +196,7 @@ public class SequentialAlignment {
 		}
 		
 		int finalScore = (numMatches*matchScore) - (numStartGaps*startGapScore) - (numContGaps*continueGapScore);
-		AlignResult result = new AlignResult(gap1, gap2, numMatches, finalScore);
+		AlignResult result = new AlignResult("Test", gap1, gap2, numMatches, finalScore);
 		System.out.println("FINAL SCORE = " + finalScore);
 		return result;
 	}
