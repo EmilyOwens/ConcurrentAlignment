@@ -4,21 +4,33 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSetMetaData;
-
+import java.util.*;
 
 
 public class PopulateDatabase
 {
   
     private static String dbURL;
-    private static String tableName = "dnaseqs.table1";
+    private static String tableName = "dnaseqs.realtable1";
     // jdbc Connection
     private static Connection conn = null;
     private static Statement stmt = null;
 
+    static final String AB = "ACGT";
+    static Random rnd = new Random();
+
+    public static String randomString(int len) 
+    {
+       StringBuilder sb = new StringBuilder(len);
+       for(int i=0; i<len; i++) 
+          sb.append(AB.charAt(rnd.nextInt(AB.length())));
+       return sb.toString();
+    }
+
     public static void main(String[] args)
     {
         String os = System.getProperty("os.name");
+        String name;
         if (os.startsWith("Linux")){
             dbURL = "jdbc:derby:../MyDB;";
         }
@@ -26,8 +38,12 @@ public class PopulateDatabase
             dbURL = "jdbc:derby:MyDB;";
         }
         createConnection();
-        insertGenes(6, "Test6", "AlsoTestSix");
-        selectGenes();
+        for(int i=1; i<=100; i++)
+        {
+            name = "Gene" + i;
+            insertGenes(i, name, randomString(5000+rnd.nextInt(15000)));
+        }
+        //selectGenes();
         shutdown();
     }
     
@@ -44,7 +60,7 @@ public class PopulateDatabase
         {
             except.printStackTrace();
         }
-    }
+   }
     
     private static void insertGenes(int id, String geneName, String sequence)
     {
