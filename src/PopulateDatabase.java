@@ -11,7 +11,8 @@ public class PopulateDatabase
 {
   
     private static String dbURL;
-    private static String tableName = "dnaseqs.realtable1";
+    //private static String tableName = "dnaseqs.realtable1";
+    private static String tableName = "dnaseqs.realtable2";
     // jdbc Connection
     private static Connection conn = null;
     private static Statement stmt = null;
@@ -38,10 +39,19 @@ public class PopulateDatabase
             dbURL = "jdbc:derby:MyDB;";
         }
         createConnection();
+        
+        try {
+            Statement createStmt = conn.createStatement();
+            createStmt.execute("create table dnaseqs.realtable2(id INTEGER NOT NULL, geneName VARCHAR(20) NOT NULL, sequence VARCHAR(5000) NOT NULL, PRIMARY KEY (id))");
+            createStmt.close();
+        } catch (SQLException sqlExcept){}
+        
         for(int i=1; i<=100; i++)
         {
             name = "Gene" + i;
-            insertGenes(i, name, randomString(5000+rnd.nextInt(15000)));
+//            insertGenes(i, name, randomString(5000+rnd.nextInt(15000)));
+            insertGenes(i, name, randomString(1000+rnd.nextInt(4000)));
+
         }
         //selectGenes();
         shutdown();
