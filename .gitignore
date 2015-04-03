@@ -25,6 +25,11 @@ local.properties
 # Derby error log
 derby.log
 
+# DB log files <--- Probably okay to ignore?
+MyDB/log/log.ctrl
+MyDB/log/log4.dat
+MyDB/log/logmirror.ctrl
+
 # Eclipse Core
 .project
 
