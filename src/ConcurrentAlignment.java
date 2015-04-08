@@ -12,7 +12,7 @@ import java.util.concurrent.*;
 public class ConcurrentAlignment implements Runnable{
 	
     private static String dbURL;
-    private static String tableName = "dnaseqs.realtable1";
+    private static String tableName = "dnaseqs.realtable2";
     // jdbc Connection
     public static Connection conn = null;
     
@@ -58,7 +58,7 @@ public class ConcurrentAlignment implements Runnable{
             while(next){
 //                int id = results.getInt(1);
 //                String geneName = results.getString(2);
-                String sequence = results.getString(3);
+//                String sequence = results.getString(3);
                 
                 int[][] testBacktrace = ConstructArray(target, test1);//sequence);
                 if (testBacktrace.length == 0 ){
@@ -249,8 +249,8 @@ public class ConcurrentAlignment implements Runnable{
 		
 		int finalScore = (numMatches.get()*matchScore) - (numStartGaps.get()*startGapScore) - (numContGaps.get()*continueGapScore);
 		AlignResult result = new AlignResult("Test", gap1, gap2, numMatches.get(), finalScore);
-		System.out.println("FINAL SCORE = " + finalScore);
-		System.out.println("Aligned Sequence = " + gap1);
+//		System.out.println("FINAL SCORE = " + finalScore);
+//		System.out.println("Aligned Sequence = " + gap1);
 		return result;
 	}
 	
@@ -273,19 +273,25 @@ public class ConcurrentAlignment implements Runnable{
         
 		try {
 			ResultSet results = stmt.executeQuery("select * from " + tableName);
-			BlockingQueue<ResultSet> queue1 = new LinkedBlockingQueue<ResultSet>(10);
+			BlockingQueue<DbResult> queue1 = new LinkedBlockingQueue<DbResult>(10);
 	        Producer producer = new Producer(queue1, results);
 	        Consumer consumer = new Consumer(queue1, target);
 	        
 	        Thread p1 = new Thread(producer);
+	        //Thread p2 = new Thread(producer);
 	        Thread c1 = new Thread(consumer);
+//	        Thread c2 = new Thread(consumer);
 	        
 	        p1.start();
+	        //p2.start();
 	        c1.start();
+//	        c2.start();
 	        
 	        try{
 	        	p1.join();
+	        	//p2.join();
 	        	c1.join();
+//	        	c2.join();
 	        } catch(InterruptedException e) {}
 	        
 		} catch (SQLException e1) {

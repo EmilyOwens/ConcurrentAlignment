@@ -1,14 +1,14 @@
-import java.sql.ResultSet;
-import java.sql.SQLException;
+//import java.sql.ResultSet;
+//import java.sql.SQLException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class Consumer implements Runnable {
-		private BlockingQueue<ResultSet> queue1;
+		private BlockingQueue<DbResult> queue1;
 		public String target;
 
 		
-		public Consumer(BlockingQueue<ResultSet> q, String t) {
+		public Consumer(BlockingQueue<DbResult> q, String t) {
 			this.queue1 = q;
 			this.target = t;
 		}
@@ -20,19 +20,21 @@ public class Consumer implements Runnable {
 			{
 				Boolean cont = true;
 				while(cont){
-					System.out.println("Waiting... ");
+					//System.out.println("Waiting... ");
 					Thread.sleep(10);
-					ResultSet gene = queue1.poll(3, TimeUnit.SECONDS);
+					DbResult gene = queue1.poll(500, TimeUnit.MILLISECONDS);
 					
+					//System.out.println("Consumed " + gene.getString(2));
 					
 					if(gene == null)
 					{
+						System.out.println("Done.");
 						return;
 					}
 					
-					System.out.println("Consumed ");
+					System.out.println("Consumed " + gene.geneName);
 					
-					String sequence = gene.getString(3);
+					String sequence = gene.sequence;
 					
 					
 					int[][] testBacktrace = ConcurrentAlignment.ConstructArray(target, sequence);
@@ -48,7 +50,7 @@ public class Consumer implements Runnable {
 				}
 				
 
-			} catch(InterruptedException | SQLException e) { }//e.printStackTrace(); }
+			} catch(InterruptedException e) { }//e.printStackTrace(); }
 			
 			
 			
