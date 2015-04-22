@@ -7,12 +7,14 @@ public class Aligner implements Runnable {
 		private BlockingQueue<KmerTuple> kmerQueue;
 		public String target;
         public String geneName;
+        public Splitter parent;
 		
-		public Aligner(BlockingQueue<KmerTuple> q, String t, String name) {
+		public Aligner(BlockingQueue<KmerTuple> q, String t, String name, Splitter parent) {
 			this.kmerQueue = q;
 			this.target = t;
             this.geneName = name;
-		}
+            this.parent = parent;
+        }
 		
 		public void run() {
 
@@ -48,8 +50,8 @@ public class Aligner implements Runnable {
 		        
 		                // For sequences of acceptable length
 		                } else {
-		                	ConcurrentAlignment.testResult = ConcurrentAlignment.getResult(testBacktrace, ConcurrentAlignment.sequence1.length, ConcurrentAlignment.sequence2.get().length, geneName, i);
-		                	ConcurrentAlignment.finalResults.add(ConcurrentAlignment.testResult);            
+		                	testResult = ConcurrentAlignment.getResult(testBacktrace, 1000, 1000, geneName, i);
+		                	parent.initialResults.add(testResult);            
 		                }
 				}
 				
