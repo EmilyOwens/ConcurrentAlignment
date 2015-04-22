@@ -51,7 +51,7 @@ public class Aligner implements Runnable {
 		                // For sequences of acceptable length
 		                } else {
 		                	testResult = ConcurrentAlignment.getResult(testBacktrace, 1000, 1000, geneName, i);
-		                	parent.initialResults.add(testResult);            
+		                	parent.initialResults.get().add(testResult);            
 		                }
 				}
 				

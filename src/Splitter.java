@@ -54,7 +54,7 @@ public class Splitter implements Runnable {
 					}
 		               System.out.println("Consumed " + gene.geneName);
 		               
-		               Aligner aligner = new Aligner(queue2, target, geneName);
+		               Aligner aligner = new Aligner(queue2, target, geneName, this);
 						
 		               Thread a1 = new Thread(aligner);
 		               Thread a2 = new Thread(aligner);
