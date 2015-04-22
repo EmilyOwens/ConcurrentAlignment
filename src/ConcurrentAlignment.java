@@ -275,12 +275,12 @@ public class ConcurrentAlignment implements Runnable{
 			ResultSet results = stmt.executeQuery("select * from " + tableName);
 			BlockingQueue<DbResult> queue1 = new LinkedBlockingQueue<DbResult>(10);
 	        Producer producer = new Producer(queue1, results);
-	        Consumer consumer = new Consumer(queue1, target);
+	        Splitter splitter = new Splitter(queue1, target);
 	        
 	        Thread p1 = new Thread(producer);
 //	        Thread p2 = new Thread(producer);
-	        Thread c1 = new Thread(consumer);
-	        Thread c2 = new Thread(consumer);
+	        Thread c1 = new Thread(splitter);
+	        Thread c2 = new Thread(splitter);
 	        
 	        p1.start();
 //	        p2.start();
