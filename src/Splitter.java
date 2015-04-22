@@ -3,18 +3,21 @@
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-//import java.util.concurrent.*;
+import java.util.*;
 
 public class Splitter implements Runnable {
 		private BlockingQueue<DbResult> queue1;
 		public String target;
 		
 		public BlockingQueue<KmerTuple> queue2;
+		
+		public ThreadLocal<LinkedList<AlignResult>> initialResults = new ThreadLocal<LinkedList<AlignResult>>();
 
 		
 		public Splitter(BlockingQueue<DbResult> q, String t) {
 			this.queue1 = q;
 			this.target = t;
+			this.initialResults.set(new LinkedList<AlignResult>());
 		}
 		
 		public void run() {
@@ -54,7 +57,7 @@ public class Splitter implements Runnable {
 					}
 		               System.out.println("Consumed " + gene.geneName);
 		               
-		               Aligner aligner = new Aligner(queue2, target, geneName);
+		               Aligner aligner = new Aligner(queue2, target, geneName, this);
 						
 		               Thread a1 = new Thread(aligner);
 		               Thread a2 = new Thread(aligner);
