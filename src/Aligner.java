@@ -4,11 +4,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class Aligner implements Runnable {
-		private BlockingQueue<DbResult> kmerQueue;
+		private BlockingQueue<KmerTuple> kmerQueue;
 		public String target;
         public String geneName;
 		
-		public Aligner(BlockingQueue<DbResult> q, String t, String name) {
+		public Aligner(BlockingQueue<KmerTuple> q, String t, String name) {
 			this.kmerQueue = q;
 			this.target = t;
             this.geneName = name;
@@ -34,7 +34,7 @@ public class Aligner implements Runnable {
 						return;
 					}
 					
-                    String kmer = tuple.kmer;
+                    String kmer = tuple.kMer;
                     int i = tuple.i;
                     
 					System.out.println("Consumed " + geneName);
@@ -48,7 +48,7 @@ public class Aligner implements Runnable {
 		        
 		                // For sequences of acceptable length
 		                } else {
-		                	ConcurrentAlignment.testResult = ConcurrentAlignment.getResult(testBacktrace, ConcurrentAlignment.sequence1.length, ConcurrentAlignment.sequence2.get().length);
+		                	ConcurrentAlignment.testResult = ConcurrentAlignment.getResult(testBacktrace, ConcurrentAlignment.sequence1.length, ConcurrentAlignment.sequence2.get().length, geneName, i);
 		                	ConcurrentAlignment.finalResults.add(ConcurrentAlignment.testResult);            
 		                }
 				}

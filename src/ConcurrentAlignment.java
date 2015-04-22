@@ -9,7 +9,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.*;
 
-public class ConcurrentAlignment implements Runnable{
+public class ConcurrentAlignment {
 	
     private static String dbURL;
     private static String tableName = "dnaseqs.realtable2";
@@ -48,39 +48,7 @@ public class ConcurrentAlignment implements Runnable{
 	public static int matchScore = 5;
 	public static int startGapScore = 2;
 	public static int continueGapScore = 1;
-	
-	public void run(){
-        try{
-            lock.lock();
-            Boolean next = results.next();
-            lock.unlock();
-            
-            while(next){
-//                int id = results.getInt(1);
-//                String geneName = results.getString(2);
-//                String sequence = results.getString(3);
-                
-                int[][] testBacktrace = ConstructArray(target, test1);//sequence);
-                if (testBacktrace.length == 0 ){
-                    System.out.println("Sequence length exceeded maximum. Alignment not computed.");
-                    System.out.println();
-        
-                // For sequences of acceptable length
-                } else {
-                    testResult = getResult(testBacktrace, sequence1.length, sequence2.get().length);
-                    finalResults.add(testResult);            
-                }
-                
-                lock.lock();
-                next = results.next();
-                lock.unlock();
-            }
-        }
-        catch (SQLException sqlExcept){
-            sqlExcept.printStackTrace();
-        }
-        
-    }
+
     
 
     
@@ -166,7 +134,7 @@ public class ConcurrentAlignment implements Runnable{
 		}
 	}
 	
-	public static AlignResult getResult(int[][] backtrace, int i, int j){
+	public static AlignResult getResult(int[][] backtrace, int i, int j, String gene, int iteration){
 
 		//Initialize scoring
 		numMatches.set(0);
@@ -248,7 +216,8 @@ public class ConcurrentAlignment implements Runnable{
 		}
 		
 		int finalScore = (numMatches.get()*matchScore) - (numStartGaps.get()*startGapScore) - (numContGaps.get()*continueGapScore);
-		AlignResult result = new AlignResult("Test", gap1, gap2, numMatches.get(), finalScore);
+		AlignResult result = new AlignResult(gene +" - "+ iteration, gap1, gap2, numMatches.get(), finalScore);
+
 //		System.out.println("FINAL SCORE = " + finalScore);
 //		System.out.println("Aligned Sequence = " + gap1);
 		return result;
