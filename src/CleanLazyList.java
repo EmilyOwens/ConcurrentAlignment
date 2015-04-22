@@ -12,7 +12,7 @@ public class CleanLazyList<T> {
 		return !pred.marked && !curr.marked && pred.next == curr;
 	}
 	
-	public boolean add(T item) {
+	public CleanLazyList add(T item) {
 		int key = item.hashCode();
 		while (true) {
 			Node pred = head;
@@ -32,7 +32,7 @@ public class CleanLazyList<T> {
 							Node node = new Node(item);
 							node.next = curr;
 							pred.next = node;
-							return true;
+							return this;
 						//}
 					}
 				} finally {
@@ -44,7 +44,7 @@ public class CleanLazyList<T> {
 		}
 	}
 	
-	public boolean remove(T item) {
+	public CleanLazyList remove(T item) {
 		int key = item.hashCode();
 		while (true) {
 			Node pred = head;
@@ -61,11 +61,11 @@ public class CleanLazyList<T> {
 				try {
 					if (validate(pred, curr)){
 						if (curr.key != key){
-							return false;
+							return this;
 						} else {
 							curr.marked = true;
 							//pred.next = curr.next;
-							return true;
+							return this;
 						}
 					}
 				} finally {
