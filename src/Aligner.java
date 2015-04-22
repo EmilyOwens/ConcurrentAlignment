@@ -48,7 +48,7 @@ public class Aligner implements Runnable {
 		        
 		                // For sequences of acceptable length
 		                } else {
-		                	ConcurrentAlignment.testResult = ConcurrentAlignment.getResult(testBacktrace, ConcurrentAlignment.sequence1.length, ConcurrentAlignment.sequence2.get().length);
+		                	ConcurrentAlignment.testResult = ConcurrentAlignment.getResult(testBacktrace, ConcurrentAlignment.sequence1.length, ConcurrentAlignment.sequence2.get().length, geneName, i);
 		                	ConcurrentAlignment.finalResults.add(ConcurrentAlignment.testResult);            
 		                }
 				}
