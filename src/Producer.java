@@ -27,7 +27,7 @@ public class Producer implements Runnable {
 //	            
 	                try {
 	                	Thread.sleep(5);
-	                	ConcurrentAlignment.lock.lock();
+//	                	ConcurrentAlignment.lock.lock();
 	                	DbResult ourResult = new DbResult(results.getInt(1), results.getString(2), results.getString(3));
 	                	producerArray[index] = ourResult;
 //	                	System.out.println(producerArray[0].getString(2));
@@ -39,7 +39,7 @@ public class Producer implements Runnable {
 //	                System.out.println("Did Produce "+results.getString(2));
 //	                ConcurrentAlignment.lock.lock();
 	                next = results.next();
-	                ConcurrentAlignment.lock.unlock();
+	                //ConcurrentAlignment.lock.unlock();
 	                //System.out.println("Will Produce "+results.getString(2));
 	                index++;
 	            }
@@ -48,21 +48,14 @@ public class Producer implements Runnable {
 	            for (int i=0; i<25; i++)
 	            {
 	            	try {
-	            		System.out.println("Should Produce "+producerArray[i].geneName);
+	            		//System.out.println("Should Produce "+producerArray[i].geneName);
+	            		System.out.println("Produced "+producerArray[i].geneName);
 	            		queue1.put(producerArray[i]);
-	            		//System.out.println("Did Produce "+results.getString(2));
+	            		
 	            	} catch (InterruptedException | NullPointerException e) {
 //						e.printStackTrace();
     				}
 	            }
-
-	            
-	            try {
-	            	producerArray[100] = null;
-            		queue1.put(producerArray[100]);
-            	} catch (InterruptedException | NullPointerException e) {
-//					e.printStackTrace();
-				}
 
 	            
 	        }

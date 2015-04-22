@@ -278,20 +278,20 @@ public class ConcurrentAlignment implements Runnable{
 	        Consumer consumer = new Consumer(queue1, target);
 	        
 	        Thread p1 = new Thread(producer);
-	        //Thread p2 = new Thread(producer);
+//	        Thread p2 = new Thread(producer);
 	        Thread c1 = new Thread(consumer);
-//	        Thread c2 = new Thread(consumer);
+	        Thread c2 = new Thread(consumer);
 	        
 	        p1.start();
-	        //p2.start();
+//	        p2.start();
 	        c1.start();
-//	        c2.start();
+	        c2.start();
 	        
 	        try{
 	        	p1.join();
-	        	//p2.join();
+//	        	p2.join();
 	        	c1.join();
-//	        	c2.join();
+	        	c2.join();
 	        } catch(InterruptedException e) {}
 	        
 		} catch (SQLException e1) {
