@@ -106,6 +106,7 @@ public class CleanLazyList {
 			{
 				pred = curr;
 				curr = curr.next;
+				i++;
 			}
 			
 			pred.lock();
