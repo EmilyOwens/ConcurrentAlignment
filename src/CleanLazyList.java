@@ -12,8 +12,10 @@ public class CleanLazyList {
 		return !pred.marked && !curr.marked && pred.next == curr;
 	}
 	
+
 	public boolean add(AlignResult item) {
 		int key = item.alignmentScore;
+
 		while (true) {
 			Node pred = head;
 			Node curr = head.next;
@@ -44,8 +46,10 @@ public class CleanLazyList {
 		}
 	}
 	
+
 	public boolean remove(AlignResult item) {
 		int key = item.alignmentScore;
+
 		while (true) {
 			Node pred = head;
 			Node curr = head.next;
