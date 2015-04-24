@@ -1,23 +1,23 @@
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+//import java.util.concurrent.locks.Lock;
+//import java.util.concurrent.locks.ReentrantLock;
 
-public class CleanLazyList<T> {
+public class CleanLazyList {
 	private Node head;
 	public CleanLazyList() {
-		head = new Node(Integer.MIN_VALUE);
-		head.next = new Node(Integer.MAX_VALUE);
+		head = new Node(Integer.MAX_VALUE, null);
+		head.next = new Node(Integer.MIN_VALUE, null);
 	}
 	
 	public boolean validate(Node pred, Node curr){
 		return !pred.marked && !curr.marked && pred.next == curr;
 	}
 	
-	public boolean add(T item) {
-		int key = item.hashCode();
+	public boolean add(AlignResult item) {
+		int key = item.alignmentScore;
 		while (true) {
 			Node pred = head;
 			Node curr = head.next;
-			while (curr.key < key){
+			while (curr.key > key){
 				pred = curr;
 				curr = curr.next;
 			}
@@ -29,7 +29,7 @@ public class CleanLazyList<T> {
 						/*if (curr.key == key){
 							return false;
 						} else {*/
-							Node node = new Node(item);
+							Node node = new Node(item.alignmentScore, item);
 							node.next = curr;
 							pred.next = node;
 							return true;
@@ -44,12 +44,12 @@ public class CleanLazyList<T> {
 		}
 	}
 	
-	public boolean remove(T item) {
-		int key = item.hashCode();
+	public boolean remove(AlignResult item) {
+		int key = item.alignmentScore;
 		while (true) {
 			Node pred = head;
 			Node curr = head.next;
-			while (curr.key < key){
+			while (curr.key > key){
 				pred = curr;
 				curr = curr.next;
 			}
@@ -78,13 +78,49 @@ public class CleanLazyList<T> {
                 
 	}
 	
-	public boolean contains(T item) {
+	public boolean contains(AlignResult item) {
 		int key = item.hashCode();
 		Node curr = head;
 		while (curr.key < key){
 			curr = curr.next;
 		}
 		return curr.key == key && !curr.marked;
+	}
+	
+	public AlignResult get(int index) {
+		if (index <=0)
+		{
+			return null;
+		}
+		int i = 1;
+		
+		while(true) {
+			Node pred = head;
+			Node curr = head.next;
+			
+			while(i < index)
+			{
+				pred = curr;
+				curr = curr.next;
+			}
+			
+			pred.lock();
+			try {
+				curr.lock();
+				try {
+					if (validate(pred, curr)){
+	
+							return curr.data;
+
+					}
+				} finally {
+					curr.unlock();
+				}
+			} finally {
+				pred.unlock();
+			}
+		}
+		
 	}
 	
 	public boolean cleanUp() {

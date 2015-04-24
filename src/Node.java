@@ -1,26 +1,33 @@
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Lock;
 
-public class Node<T> {
+public class Node {
       
       public int key;
-      public Node<T> next;
+      public Node next;
       public boolean marked;
       private Lock nodeLock = new ReentrantLock();
     
-      public Node(T item) {
-         this.key = item.hashCode();
+      public AlignResult data;
+      
+      
+      public Node(int item, AlignResult data) {
+         this.key = item;
          this.marked = false;
+         this.data = data;
          
       }
           
+      public AlignResult getData() {
+    	  return data;
+      }
 
-    public void lock() {
-        nodeLock.lock();
-    }
-    
-    public void unlock() {
-        nodeLock.unlock();
-    }
+      public void lock() {
+    	  	nodeLock.lock();
+	  }
+	    
+      public void unlock() {  
+    	  nodeLock.unlock();  
+      }
 
 }

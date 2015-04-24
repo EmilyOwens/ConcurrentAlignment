@@ -3,7 +3,7 @@
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.*;
+//import java.util.*;
 
 public class Splitter implements Runnable {
 		private BlockingQueue<DbResult> queue1;
@@ -11,13 +11,13 @@ public class Splitter implements Runnable {
 		
 		public BlockingQueue<KmerTuple> queue2;
 		
-		public ThreadLocal<LinkedList<AlignResult>> initialResults = new ThreadLocal<LinkedList<AlignResult>>();
+		public ThreadLocal<CleanLazyList> initialResults = new ThreadLocal<CleanLazyList>();
 
 		
 		public Splitter(BlockingQueue<DbResult> q, String t) {
 			this.queue1 = q;
 			this.target = t;
-			this.initialResults.set(new LinkedList<AlignResult>());
+			this.initialResults.set(new CleanLazyList());
 		}
 		
 		public void run() {
