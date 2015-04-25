@@ -39,31 +39,35 @@ public class Splitter implements Runnable {
                     initialResults.set(new CleanLazyList());
 					//System.out.println("Waiting... ");
 					Thread.sleep(10);
-					DbResult gene = queue1.poll(500, TimeUnit.MILLISECONDS);
+					ThreadLocal<DbResult> gene = new ThreadLocal<DbResult>();
+                    gene.set(queue1.poll(500, TimeUnit.MILLISECONDS));
 					
 //					System.out.println("Consumed " + gene.getString(2));
 					
-					if(gene == null)
+					if(gene.get() == null)
 					{
 						System.out.println("Done.");
 						return;
 					}
 					
 					//System.out.println("gene.geneName= " +gene.geneName);
-                    sequence.set(gene.sequence);
-                    geneName.set(gene.geneName);
+                    sequence.set(gene.get().sequence);
+                    geneName.set(gene.get().geneName);
 					//System.out.println("geneName= " +geneName.get());
 
 					queue2 = new LinkedBlockingQueue<KmerTuple>(10*(sequence.get().length() - target.length()));
-					
-					for (int i=0; i < (sequence.get().length() - target.length()); i++)
+					ThreadLocal<Integer> i = new ThreadLocal<Integer>();
+                    
+					for (i.set(0); i.get() < (sequence.get().length() - target.length()); i.set(i.get()+1))
 					{
 //						System.out.println("Step " + i + " of " + (sequence.length() - target.length()));
-	                	String kMer = sequence.get().substring(i, i+target.length());
+	                	ThreadLocal<String> kMer = new ThreadLocal<String>();
+                        kMer.set(sequence.get().substring(i.get(), i.get()+target.length()));
 	                	
-	                	KmerTuple ourKMer = new KmerTuple(kMer, i);
+	                	ThreadLocal<KmerTuple> ourKMer = new ThreadLocal<KmerTuple>();
+                        ourKMer.set(new KmerTuple(kMer.get(), i.get()));
 	                	
-	                	queue2.put(ourKMer);
+	                	queue2.put(ourKMer.get());
 //	                	System.out.println("Got here");
 	                	
 					}
