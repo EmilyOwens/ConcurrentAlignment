@@ -21,6 +21,7 @@ public class Aligner implements Runnable {
 			
 			try 
 			{
+//				parent.initialResults.set(parent.initialResults.get());
 				Boolean cont = true;
 				while(cont){
 					//System.out.println("Waiting... ");
@@ -39,7 +40,7 @@ public class Aligner implements Runnable {
                     String kmer = tuple.kMer;
                     int i = tuple.i;
                     
-					System.out.println("Consumed " + geneName);
+					System.out.println("Consumed " + geneName+ " "+ i);
 					
 					
 					
@@ -51,7 +52,12 @@ public class Aligner implements Runnable {
 		                // For sequences of acceptable length
 		                } else {
 		                	AlignResult testResult = ConcurrentAlignment.getResult(testBacktrace, target.length(), kmer.length(), geneName, i);
-//		                	parent.initialResults.add(testResult);            
+		                	
+		                	if(testResult.alignmentScore >= Splitter.initialResults.get().get(1).alignmentScore)
+		                	{
+		                		Splitter.initialResults.get().add(testResult);  
+		                	}
+//		                	          
 
 		                }
 				}

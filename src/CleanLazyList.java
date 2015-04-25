@@ -13,7 +13,7 @@ public class CleanLazyList {
 	}
 	
 
-	public boolean add(AlignResult item) {
+	public void add(AlignResult item) {
 		int key = item.alignmentScore;
 
 		while (true) {
@@ -34,7 +34,7 @@ public class CleanLazyList {
 							Node node = new Node(item.alignmentScore, item);
 							node.next = curr;
 							pred.next = node;
-							return true;
+							return;
 						//}
 					}
 				} finally {
@@ -47,7 +47,7 @@ public class CleanLazyList {
 	}
 	
 
-	public boolean remove(AlignResult item) {
+	public void remove(AlignResult item) {
 		int key = item.alignmentScore;
 
 		while (true) {
@@ -65,11 +65,11 @@ public class CleanLazyList {
 				try {
 					if (validate(pred, curr)){
 						if (curr.key != key){
-							return false;
+							return;
 						} else {
 							curr.marked = true;
 							//pred.next = curr.next;
-							return true;
+							return;
 						}
 					}
 				} finally {
@@ -85,7 +85,7 @@ public class CleanLazyList {
 	public boolean contains(AlignResult item) {
 		int key = item.hashCode();
 		Node curr = head;
-		while (curr.key < key){
+		while (curr.key > key){
 			curr = curr.next;
 		}
 		return curr.key == key && !curr.marked;
