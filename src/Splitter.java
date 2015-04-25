@@ -19,7 +19,7 @@ public class Splitter implements Runnable {
 		public static InheritableThreadLocal<CleanLazyList> initialResults = new InheritableThreadLocal<CleanLazyList>();
         public static InheritableThreadLocal<String> geneName = new InheritableThreadLocal<String>();
         public static ThreadLocal<String> sequence = new ThreadLocal<String>();
-        public static Aligner aligner;
+        //public static Aligner aligner;
 		
 		public Splitter(BlockingQueue<DbResult> q, String t) {
 			this.queue1 = q;
@@ -72,10 +72,10 @@ public class Splitter implements Runnable {
 	                	
 					}
 		               
-	               aligner = new Aligner(queue2, target);//, geneName.get());
+	               //aligner = new Aligner(queue2, target);//, geneName.get());
 					
-	               Thread a1 = new Thread(aligner);
-	               Thread a2 = new Thread(aligner);
+	               Thread a1 = new Thread(new Aligner(queue2, target));
+	               Thread a2 = new Thread(new Aligner(queue2, target));
 	               
 	               a1.start();
 	               a2.start();

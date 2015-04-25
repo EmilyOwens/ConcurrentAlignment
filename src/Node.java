@@ -6,7 +6,7 @@ public class Node {
       public int key;
       public Node next;
       public boolean marked;
-      private Lock nodeLock = new ReentrantLock();
+      private Lock nodeLock;// = new ReentrantLock();
     
       public AlignResultConcurrent data;
       
@@ -15,6 +15,8 @@ public class Node {
          this.key = item;
          this.marked = false;
          this.data = item2;
+         this.next = null;
+         this.nodeLock = new ReentrantLock();
          
       }
           

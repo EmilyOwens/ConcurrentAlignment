@@ -57,23 +57,23 @@ public class ConcurrentAlignment {
 			ResultSet results = stmt.executeQuery("select * from " + tableName);
 			BlockingQueue<DbResult> queue1 = new LinkedBlockingQueue<DbResult>(10);
 	        Producer producer = new Producer(queue1, results);
-	        Splitter splitter = new Splitter(queue1, target);
+	        //Splitter splitter = new Splitter(queue1, target);
 	        
 	        Thread p1 = new Thread(producer);
 //	        Thread p2 = new Thread(producer);
-	        Thread c1 = new Thread(splitter);
-	        Thread c2 = new Thread(splitter);
+	        Thread c1 = new Thread(new Splitter(queue1, target));
+	        Thread c2 = new Thread(new Splitter(queue1, target));
 	        
 	        p1.start();
 //	        p2.start();
 	        c1.start();
-	        c2.start();
+	        //c2.start();
 	        
 	        try{
 	        	p1.join();
 //	        	p2.join();
 	        	c1.join();
-	        	c2.join();
+	        	//c2.join();
 	        } catch(InterruptedException e) {}
 	        
 		} catch (SQLException e1) {
