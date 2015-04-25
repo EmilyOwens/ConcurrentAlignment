@@ -73,7 +73,7 @@ public class CleanLazyList {
 						} else {
 							curr.marked = true;
                             size--;
-							//pred.next = curr.next;
+							pred.next = curr.next;
 							return;
 						}
 					}

@@ -111,7 +111,7 @@ public class Aligner implements Runnable {
                 	}
                 	lock.unlock();
                 	
-                	Splitter.initialResults.get().cleanUp();
+                	//Splitter.initialResults.get().cleanUp();
                 	         
                 }
 	                
