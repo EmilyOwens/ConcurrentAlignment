@@ -43,7 +43,7 @@ public class PopulateDatabase
         
         try {
             Statement createStmt = conn.createStatement();
-            createStmt.execute("create table dnaseqs.realtable2(id INTEGER NOT NULL, geneName VARCHAR(20) NOT NULL, sequence VARCHAR(5000) NOT NULL, PRIMARY KEY (id))");
+            createStmt.execute("create table dnaseqs.testtable1(id INTEGER NOT NULL, geneName VARCHAR(20) NOT NULL, sequence VARCHAR(5000) NOT NULL, PRIMARY KEY (id))");
             createStmt.close();
         } catch (SQLException sqlExcept){}
         
