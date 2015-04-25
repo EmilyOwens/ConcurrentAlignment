@@ -7,10 +7,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Aligner implements Runnable {
-	private BlockingQueue<KmerTuple> kmerQueue;
+	private ThreadLocal<BlockingQueue<KmerTuple>> kmerQueue = new ThreadLocal<BlockingQueue<KmerTuple>>;
 	public String target;
-    public String geneName;
-    public Splitter parent;
+    public ThreadLocal<String geneName> = new ThreadLocal<BlockingQueue<KmerTuple>>;
     
     public Lock lock = new ReentrantLock();
     
@@ -29,11 +28,10 @@ public class Aligner implements Runnable {
 	public static int continueGapScore = 1;
 
 	
-	public Aligner(BlockingQueue<KmerTuple> q, String t, String name, Splitter parent) {
-		this.kmerQueue = q;
+	public Aligner(BlockingQueue<KmerTuple> q, String t, String name) {
+		this.kmerQueue.set(q);
 		this.target = t;
-        this.geneName = name;
-        this.parent = parent;
+        this.geneName.set(name);
     }
 	
 	public void run() {
@@ -46,18 +44,20 @@ public class Aligner implements Runnable {
 			while(cont){
 				//System.out.println("Waiting... ");
 				Thread.sleep(10);
-				KmerTuple tuple = kmerQueue.poll(500, TimeUnit.MILLISECONDS);
+				ThreadLocal<KmerTuple> tuple = new ThreadLocal<KmerTuple>();
+                tuple.set(kmerQueue.get().poll(500, TimeUnit.MILLISECONDS));
 				
                 
 				//System.out.println("Consumed " + gene.getString(2));
 				
-				if(tuple == null)
+				if((KmerTuple)tuple.get() == null)
 				{
 //						System.out.println("Aligner done.");
 					return;
 				}
 				
-                String kmer = tuple.kMer;
+                ThreadLocal<String> kmer = new ThreadLocal<String>();
+                kmer.set(tuple.kMer);
                 ThreadLocal<Integer> i = new ThreadLocal<Integer>();
                 i.set(tuple.i);
                 
@@ -65,31 +65,34 @@ public class Aligner implements Runnable {
 				
 				
 				
-				int[][] testBacktrace = ConstructArray(target, kmer);
-                if (testBacktrace.length == 0 ){
+				ThreadLocal<int[][]> testBacktrace = new ThreadLocal<int[][]>()
+                testBackTrace.set(ConstructArray(target, kmer.get()));
+                if (testBacktrace.get().length == 0 ){
                     System.out.println("Sequence length exceeded maximum. Alignment not computed.");
                     System.out.println();
         
                 // For sequences of acceptable length
                 } else {
-                	AlignResult testResult = getResult(testBacktrace, target.length(), kmer.length(), geneName, i.get());
+                	ThreadLocal<AlignResult> testResult = new ThreadLocal<AlignResult>();
+                    testResult.set(getResult(testBacktrace.get(), target.length(), kmer.get().length(), geneName.get(), i.get()));
                 	
                 	lock.lock();
                 	if (Splitter.initialResults.get().size() == 0)
                 	{
-                		Splitter.initialResults.get().add(testResult); 
+                		Splitter.initialResults.get().add(testResult.get()); 
                 	}
-                	else if(testResult.alignmentScore >= Splitter.initialResults.get().get(1).alignmentScore)
+                	else if(testResult.get().alignmentScore >= Splitter.initialResults.get().get(1).alignmentScore)
                 	{
-                		Splitter.initialResults.get().add(testResult);  
+                		Splitter.initialResults.get().add(testResult.get());  
                 	}
-                	int initialBestScore = Splitter.initialResults.get().get(1).alignmentScore;
+                	ThreadLocal<Integer> initialBestScore = new ThreadLocal<Integer>():
+                    initialBestScore.set(Splitter.initialResults.get().get(1).alignmentScore);
                 	lock.unlock();
                 	
                 	lock.lock();
                 	for(int l=1; l <= Splitter.initialResults.get().size(); l++)
                 	{
-                		if (Splitter.initialResults.get().get(l).alignmentScore < initialBestScore) 
+                		if (Splitter.initialResults.get().get(l).alignmentScore < initialBestScore.get()) 
                 		{
                 			Splitter.initialResults.get().remove(Splitter.initialResults.get().get(l));
                 		}

@@ -66,7 +66,7 @@ public class Splitter implements Runnable {
 	                	
 					}
 		               
-	               Aligner aligner = new Aligner(queue2, target, geneName.get(), this);
+	               Aligner aligner = new Aligner(queue2, target, geneName.get());
 					
 	               Thread a1 = new Thread(aligner);
 	               Thread a2 = new Thread(aligner);
