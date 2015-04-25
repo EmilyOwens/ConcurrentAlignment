@@ -7,9 +7,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Aligner implements Runnable {
-	private ThreadLocal<BlockingQueue<KmerTuple>> kmerQueue = new ThreadLocal<BlockingQueue<KmerTuple>>;
+	private ThreadLocal<BlockingQueue<KmerTuple>> kmerQueue = new ThreadLocal<BlockingQueue<KmerTuple>>();
 	public String target;
-    public ThreadLocal<String geneName> = new ThreadLocal<BlockingQueue<KmerTuple>>;
+    public ThreadLocal<String> geneName = new ThreadLocal<String>();
     
     public Lock lock = new ReentrantLock();
     
@@ -57,15 +57,15 @@ public class Aligner implements Runnable {
 				}
 				
                 ThreadLocal<String> kmer = new ThreadLocal<String>();
-                kmer.set(tuple.kMer);
+                kmer.set(tuple.get().kMer);
                 ThreadLocal<Integer> i = new ThreadLocal<Integer>();
-                i.set(tuple.i);
+                i.set(tuple.get().i);
                 
 //					System.out.println("Consumed " + geneName+ " "+ i);
 				
 				
 				
-				ThreadLocal<int[][]> testBacktrace = new ThreadLocal<int[][]>()
+				ThreadLocal<int[][]> testBacktrace = new ThreadLocal<int[][]>();
                 testBackTrace.set(ConstructArray(target, kmer.get()));
                 if (testBacktrace.get().length == 0 ){
                     System.out.println("Sequence length exceeded maximum. Alignment not computed.");
@@ -85,7 +85,7 @@ public class Aligner implements Runnable {
                 	{
                 		Splitter.initialResults.get().add(testResult.get());  
                 	}
-                	ThreadLocal<Integer> initialBestScore = new ThreadLocal<Integer>():
+                	ThreadLocal<Integer> initialBestScore = new ThreadLocal<Integer>();
                     initialBestScore.set(Splitter.initialResults.get().get(1).alignmentScore);
                 	lock.unlock();
                 	
