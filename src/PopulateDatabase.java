@@ -12,7 +12,8 @@ public class PopulateDatabase
   
     private static String dbURL;
     //private static String tableName = "dnaseqs.realtable1";
-    private static String tableName = "dnaseqs.realtable2";
+    //private static String tableName = "dnaseqs.realtable2";
+    private static String tableName = "dnaseqs.testtable1";
     // jdbc Connection
     private static Connection conn = null;
     private static Statement stmt = null;
@@ -46,11 +47,11 @@ public class PopulateDatabase
             createStmt.close();
         } catch (SQLException sqlExcept){}
         
-        for(int i=1; i<=100; i++)
+        for(int i=1; i<=10; i++)
         {
             name = "Gene" + i;
 //            insertGenes(i, name, randomString(5000+rnd.nextInt(15000)));
-            insertGenes(i, name, randomString(1000+rnd.nextInt(4000)));
+            insertGenes(i, name, randomString(100));//+rnd.nextInt(4000)));
 
         }
         //selectGenes();
