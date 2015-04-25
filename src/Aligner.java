@@ -39,12 +39,19 @@ public class Aligner implements Runnable {
 		
 		try 
 		{
+            ThreadLocal<KmerTuple> tuple = new ThreadLocal<KmerTuple>();
+            ThreadLocal<String> kmer = new ThreadLocal<String>();
+            ThreadLocal<Integer> i = new ThreadLocal<Integer>();
+            ThreadLocal<int[][]> testBacktrace = new ThreadLocal<int[][]>();
+            ThreadLocal<AlignResult> testResult = new ThreadLocal<AlignResult>();
+            ThreadLocal<Integer> initialBestScore = new ThreadLocal<Integer>();
+
 //				parent.initialResults.set(parent.initialResults.get());
 			Boolean cont = true;
 			while(cont){
 				//System.out.println("Waiting... ");
 				Thread.sleep(10);
-				ThreadLocal<KmerTuple> tuple = new ThreadLocal<KmerTuple>();
+				
                 tuple.set(kmerQueue.get().poll(500, TimeUnit.MILLISECONDS));
 				
                 
@@ -56,16 +63,15 @@ public class Aligner implements Runnable {
 					return;
 				}
 				
-                ThreadLocal<String> kmer = new ThreadLocal<String>();
+                
                 kmer.set(tuple.get().kMer);
-                ThreadLocal<Integer> i = new ThreadLocal<Integer>();
+                
                 i.set(tuple.get().i);
                 
 //					System.out.println("Consumed " + geneName+ " "+ i);
 				
 				
 				
-				ThreadLocal<int[][]> testBacktrace = new ThreadLocal<int[][]>();
                 testBackTrace.set(ConstructArray(target, kmer.get()));
                 if (testBacktrace.get().length == 0 ){
                     System.out.println("Sequence length exceeded maximum. Alignment not computed.");
@@ -73,7 +79,6 @@ public class Aligner implements Runnable {
         
                 // For sequences of acceptable length
                 } else {
-                	ThreadLocal<AlignResult> testResult = new ThreadLocal<AlignResult>();
                     testResult.set(getResult(testBacktrace.get(), target.length(), kmer.get().length(), geneName.get(), i.get()));
                 	
                 	lock.lock();
@@ -85,7 +90,6 @@ public class Aligner implements Runnable {
                 	{
                 		Splitter.initialResults.get().add(testResult.get());  
                 	}
-                	ThreadLocal<Integer> initialBestScore = new ThreadLocal<Integer>();
                     initialBestScore.set(Splitter.initialResults.get().get(1).alignmentScore);
                 	lock.unlock();
                 	
