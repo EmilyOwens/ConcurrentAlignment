@@ -49,7 +49,7 @@ public class Producer implements Runnable {
 	            {
 	            	try {
 	            		//System.out.println("Should Produce "+producerArray[i].geneName);
-	            		System.out.println("Produced "+producerArray[i].geneName);
+//	            		System.out.println("Produced "+producerArray[i].geneName);
 	            		queue1.put(producerArray[i]);
 	            		
 	            	} catch (InterruptedException | NullPointerException e) {

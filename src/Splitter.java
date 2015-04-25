@@ -5,12 +5,16 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 //import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Splitter implements Runnable {
 		private BlockingQueue<DbResult> queue1;
 		public String target;
 		
 		public BlockingQueue<KmerTuple> queue2;
+		
+		public Lock printLock = new ReentrantLock();
 		
 		public static InheritableThreadLocal<CleanLazyList> initialResults = new InheritableThreadLocal<CleanLazyList>();
 		
@@ -38,6 +42,15 @@ public class Splitter implements Runnable {
 					
 					if(gene == null)
 					{
+						printLock.lock();
+			            System.out.println("-----------------");
+			            for (int l=1; l <=initialResults.get().size(); l++)
+				           	{  
+				            	   System.out.println(initialResults.get().get(l).geneName + " = " + initialResults.get().get(l).alignmentScore);
+				           	}
+			            System.out.println("-----------------");
+			            printLock.unlock();
+
 						System.out.println("Done.");
 						return;
 					}
@@ -60,30 +73,28 @@ public class Splitter implements Runnable {
 	                	
 					}
 		               
-		               Aligner aligner = new Aligner(queue2, target, geneName, this);
-						
-		               Thread a1 = new Thread(aligner);
-		               Thread a2 = new Thread(aligner);
-		               
-		               a1.start();
-		               a2.start();
-		               
-		               try {
-		            	   a1.join();
-		            	   a2.join();
-		               } catch (InterruptedException e){}
-		               
+	               Aligner aligner = new Aligner(queue2, target, geneName, this);
+					
+	               Thread a1 = new Thread(aligner);
+	               Thread a2 = new Thread(aligner);
+	               
+	               a1.start();
+	               a2.start();
+	               
+	               try {
+	            	   a1.join();
+	            	   a2.join();
+	               } catch (InterruptedException e){}
+	               
+	            
 //		               System.out.println("Consumed " + gene.geneName);
 
 		               
 				}
 				
-				
-				
-				
-				
-
+			
 			} catch(InterruptedException e) { }//e.printStackTrace(); }
+			
 			
 			
 			
