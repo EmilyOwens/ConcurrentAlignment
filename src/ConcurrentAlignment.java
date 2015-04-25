@@ -67,13 +67,13 @@ public class ConcurrentAlignment {
 	        p1.start();
 //	        p2.start();
 	        c1.start();
-	        //c2.start();
+	        c2.start();
 	        
 	        try{
 	        	p1.join();
 //	        	p2.join();
 	        	c1.join();
-	        	//c2.join();
+	        	c2.join();
 	        } catch(InterruptedException e) {}
 	        
 		} catch (SQLException e1) {
