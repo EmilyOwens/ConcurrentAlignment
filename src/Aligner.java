@@ -53,7 +53,11 @@ public class Aligner implements Runnable {
 		                } else {
 		                	AlignResult testResult = ConcurrentAlignment.getResult(testBacktrace, target.length(), kmer.length(), geneName, i);
 		                	
-		                	if(testResult.alignmentScore >= Splitter.initialResults.get().get(1).alignmentScore)
+		                	if (Splitter.initialResults.get().size() == 0)
+		                	{
+		                		Splitter.initialResults.get().add(testResult); 
+		                	}
+		                	else if(testResult.alignmentScore >= Splitter.initialResults.get().get(1).alignmentScore)
 		                	{
 		                		Splitter.initialResults.get().add(testResult);  
 		                	}

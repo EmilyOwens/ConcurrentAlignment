@@ -1,9 +1,9 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
+//import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.ResultSetMetaData;
+//import java.sql.ResultSetMetaData;
 import java.util.*;
 
 
@@ -88,37 +88,37 @@ public class PopulateDatabase
         }
     }
     
-    private static void selectGenes()
-    {
-        try
-        {
-            stmt = conn.createStatement();
-            ResultSet results = stmt.executeQuery("select * from " + tableName);
-            ResultSetMetaData rsmd = results.getMetaData();
-            int numberCols = rsmd.getColumnCount();
-            for (int i=1; i<=numberCols; i++)
-            {
-                //print Column Names
-                System.out.print(rsmd.getColumnLabel(i)+"\t\t");  
-            }
-
-            System.out.println("\n-------------------------------------------------");
-
-            while(results.next())
-            {
-                int id = results.getInt(1);
-                String geneName = results.getString(2);
-                String sequence = results.getString(3);
-                System.out.println(id + "\t\t" + geneName + "\t\t" + sequence);
-            }
-            results.close();
-            stmt.close();
-        }
-        catch (SQLException sqlExcept)
-        {
-            sqlExcept.printStackTrace();
-        }
-    }
+//    private static void selectGenes()
+//    {
+//        try
+//        {
+//            stmt = conn.createStatement();
+//            ResultSet results = stmt.executeQuery("select * from " + tableName);
+//            ResultSetMetaData rsmd = results.getMetaData();
+//            int numberCols = rsmd.getColumnCount();
+//            for (int i=1; i<=numberCols; i++)
+//            {
+//                //print Column Names
+//                System.out.print(rsmd.getColumnLabel(i)+"\t\t");  
+//            }
+//
+//            System.out.println("\n-------------------------------------------------");
+//
+//            while(results.next())
+//            {
+//                int id = results.getInt(1);
+//                String geneName = results.getString(2);
+//                String sequence = results.getString(3);
+//                System.out.println(id + "\t\t" + geneName + "\t\t" + sequence);
+//            }
+//            results.close();
+//            stmt.close();
+//        }
+//        catch (SQLException sqlExcept)
+//        {
+//            sqlExcept.printStackTrace();
+//        }
+//    }
     
     private static void shutdown()
     {
