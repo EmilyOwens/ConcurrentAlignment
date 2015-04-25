@@ -7,7 +7,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Aligner implements Runnable {
-	private ThreadLocal<BlockingQueue<KmerTuple>> kmerQueue = new ThreadLocal<BlockingQueue<KmerTuple>>();
+	private BlockingQueue<KmerTuple> kmerQueue;// = new BlockingQueue<KmerTuple>();
 	public String target;
     public ThreadLocal<String> geneName = new ThreadLocal<String>();
     
@@ -29,7 +29,7 @@ public class Aligner implements Runnable {
 
 	
 	public Aligner(BlockingQueue<KmerTuple> q, String t, String name) {
-		this.kmerQueue.set(q);
+		this.kmerQueue = q;
 		this.target = t;
         this.geneName.set(name);
     }
@@ -43,7 +43,7 @@ public class Aligner implements Runnable {
             ThreadLocal<String> kmer = new ThreadLocal<String>();
             ThreadLocal<Integer> i = new ThreadLocal<Integer>();
             ThreadLocal<int[][]> testBacktrace = new ThreadLocal<int[][]>();
-            ThreadLocal<AlignResult> testResult = new ThreadLocal<AlignResult>();
+            ThreadLocal<AlignResultConcurrent> testResult = new ThreadLocal<AlignResultConcurrent>();
             ThreadLocal<Integer> initialBestScore = new ThreadLocal<Integer>();
 
 //				parent.initialResults.set(parent.initialResults.get());
@@ -54,8 +54,10 @@ public class Aligner implements Runnable {
 
                 
 				try{
-                	tuple.set(kmerQueue.get().poll(500, TimeUnit.MILLISECONDS));
+//					System.out.println(kmerQueue);
+                	tuple.set(kmerQueue.poll(500, TimeUnit.MILLISECONDS));
                 } catch (NullPointerException n) {
+                	
                 	return;
                 }
 
@@ -162,41 +164,53 @@ public class Aligner implements Runnable {
 			ThreadLocal<int [][]> backtraceArray = new ThreadLocal<int[][]>();
 			backtraceArray.set(new int[sequence1.get().length + 1][sequence2.get().length +1]);
 			
-			for(int i=1; i < sequence1.get().length + 1; i++){
-				for(int j=1; j < sequence2.get().length + 1; j++){
-					int matchMax = Math.max(Math.max(ourArray.get()[i-1][j], ourArray.get()[i][j-1]), 1+ ourArray.get()[i-1][j-1]);
-					int mismatchMax = Math.max(ourArray.get()[i-1][j], ourArray.get()[i][j-1]);
+			
+			ThreadLocal<Integer> i = new ThreadLocal<Integer>();
+			i.set(1);
+			ThreadLocal<Integer> j = new ThreadLocal<Integer>();
+			j.set(1);
+			
+			for(i.set(1); i.get() < sequence1.get().length + 1; i.set(i.get()+1)){
+				for(j.set(1); j.get() < sequence2.get().length + 1; j.set(j.get()+1)){
+					int matchMax = Math.max(Math.max(ourArray.get()[i.get()-1][j.get()], ourArray.get()[i.get()][j.get()-1]), 1+ ourArray.get()[i.get()-1][j.get()-1]);
+					int mismatchMax = Math.max(ourArray.get()[i.get()-1][j.get()], ourArray.get()[i.get()][j.get()-1]);
 					// MATCH
-					if(sequence1.get()[i-1] == sequence2.get()[j-1]){
-						ourArray.get()[i][j] = matchMax;
+					if(sequence1.get()[i.get()-1] == sequence2.get()[j.get()-1]){
+						ourArray.get()[i.get()][j.get()] = matchMax;
 						
 						//BackTrace
-						if (matchMax == 1+ ourArray.get()[i-1][j-1]){
+						if (matchMax == 1+ ourArray.get()[i.get()-1][j.get()-1]){
 							// 3 = Trace from the diagonal
-							backtraceArray.get()[i][j] = 3;
-						} else if (matchMax == ourArray.get()[i][j-1]) {
+//							System.out.println("1st " + backtraceArray.get()[i.get()][j.get()]);
+
+							backtraceArray.get()[i.get()][j.get()] = 3;
+//							System.out.println("2nd " + backtraceArray.get()[i.get()][j.get()]);
+
+						} else if (matchMax == ourArray.get()[i.get()][j.get()-1]) {
 							// 2 = Trace from the left
 							// AKA Gap in Seq2
-							backtraceArray.get()[i][j] = 2;
+							backtraceArray.get()[i.get()][j.get()] = 2;
 						} else {
 							// 1 = Trace from the top
 							// AKA Gap in Seq1
-							backtraceArray.get()[i][j] = 1;
+							backtraceArray.get()[i.get()][j.get()] = 1;
 						}
 						
 					// MISMATCH
 					} else {
-						ourArray.get()[i][j] = mismatchMax;
+						ourArray.get()[i.get()][j.get()] = mismatchMax;
 						
 						//BackTrace
-						if (matchMax == ourArray.get()[i][j-1]) {
+						if (matchMax == ourArray.get()[i.get()][j.get()-1]) {
 							// 2 = Trace from the left
 							// AKA Gap in Seq2
-							backtraceArray.get()[i][j] = 2;
+
+							backtraceArray.get()[i.get()][j.get()] = 2;
+
 						} else {
 							// 1 = Trace from the top
 							// AKA Gap in Seq1
-							backtraceArray.get()[i][j] = 1;
+							backtraceArray.get()[i.get()][j.get()] = 1;
 						}
 					}
 				}
@@ -209,39 +223,49 @@ public class Aligner implements Runnable {
 		}
 	}
 	
-	public static AlignResultConcurrent getResult(int[][] backtrace, int i, int j, String gene, int iteration){
+	public static AlignResultConcurrent getResult(int[][] backtrace, int oldI, int oldJ, String gene, int iteration){
 
+		ThreadLocal<Integer> i = new ThreadLocal<Integer>();
+		i.set(oldI);
+		ThreadLocal<Integer> j = new ThreadLocal<Integer>();
+		j.set(oldJ);
+		
 		//Initialize scoring
 		numMatches.set(0);
 		numStartGaps.set(0);
 		numContGaps.set(0);
 		
 		ThreadLocal<CharLazyList> gap1 = new ThreadLocal<CharLazyList>();
+		gap1.set(new CharLazyList());
 		ThreadLocal<CharLazyList> gap2 = new ThreadLocal<CharLazyList>();
+		gap2.set(new CharLazyList());
 		
 		
-		while(backtrace[i][j] != 0){
-			if(backtrace[i][j] == 3){
+		while(backtrace[i.get()][j.get()] != 0){
+			if(backtrace[i.get()][j.get()] == 3){
 				// Mark traversed
-				backtrace[i][j] = 6;
+				backtrace[i.get()][j.get()] = 6;
 				
 				// Increase match count
 				numMatches.set(numMatches.get()+1);
 				
 				// Create alignment
-				gap1.get().add(sequence1.get()[i-1]);
-				gap2.get().add(sequence2.get()[j-1]);
+//				System.out.println("******************");
+//				System.out.println(gap1.get());
+//				System.out.println("******************");
+				gap1.get().add(sequence1.get()[i.get()-1]);
+				gap2.get().add(sequence2.get()[j.get()-1]);
 				
 				// Go to next cell
-				i--;
-				j--;
+				i.set(i.get()-1);
+				j.set(j.get()-1);
 				
-			} else if (backtrace[i][j] == 2) {
+			} else if (backtrace[i.get()][j.get()] == 2) {
 				// Mark traversed
-				backtrace[i][j] = 5;
+				backtrace[i.get()][j.get()] = 5;
 				
 				// Increase gap score
-				if(j != sequence2.get().length && backtrace[i][j+1] == 5) {
+				if(j.get() != sequence2.get().length && backtrace[i.get()][j.get()+1] == 5) {
 					numContGaps.set(numContGaps.get()+1);
 				} else {
 					numStartGaps.set(numStartGaps.get()+1);
@@ -249,44 +273,44 @@ public class Aligner implements Runnable {
 				
 				// Create alignment
 				gap1.get().add('-');
-				gap2.get().add(sequence2.get()[j-1]);
+				gap2.get().add(sequence2.get()[j.get()-1]);
 				
 				// Go to next cell
-				j--;
+				j.set(j.get()-1);
 				
-			} else if (backtrace[i][j] == 1) {
+			} else if (backtrace[i.get()][j.get()] == 1) {
 				// Mark traversed
-				backtrace[i][j] = 4;
+				backtrace[i.get()][j.get()] = 4;
 				
 				// Increase gap score
-				if(i != sequence1.get().length && backtrace[i+1][j] == 4){
+				if(i.get() != sequence1.get().length && backtrace[i.get()+1][j.get()] == 4){
 					numContGaps.set(numContGaps.get()+1);
 				} else {
 					numStartGaps.set(numStartGaps.get()+1);
 				}
 				
 				// Create alignment
-				gap1.get().add(sequence1.get()[i-1]);
+				gap1.get().add(sequence1.get()[i.get()-1]);
 				gap2.get().add('-');
 				
 				// Go to next cell
-				i--;
+				i.set(i.get()-1);
 			}
 		}
 
-		if (i>0){
-			while (i>0){
-				gap1.get().add(sequence1.get()[i-1]);
+		if (i.get()>0){
+			while (i.get()>0){
+				gap1.get().add(sequence1.get()[i.get()-1]);
 				gap2.get().add('-');
-				i--;
+				i.set(i.get()-1);
 			}
 		}
 		
-		if (j>0){
-			while (j>0){
+		if (j.get()>0){
+			while (j.get()>0){
 				gap1.get().add('-');
-				gap2.get().add(sequence2.get()[j-1]);
-				j--;
+				gap2.get().add(sequence2.get()[j.get()-1]);
+				j.set(j.get()-1);
 			}
 		}
 		
