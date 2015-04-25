@@ -135,7 +135,7 @@ public class CleanLazyList {
     
     public int size(){
         return size;
-    }
+        }
 	
 	public boolean cleanUp() {
 		Node pred = head;
