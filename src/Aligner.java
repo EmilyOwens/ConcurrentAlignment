@@ -1,6 +1,6 @@
 //import java.sql.ResultSet;
 //import java.sql.SQLException;
-import java.util.LinkedList;
+//import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -51,8 +51,14 @@ public class Aligner implements Runnable {
 			while(cont){
 				//System.out.println("Waiting... ");
 				Thread.sleep(10);
-				
-                tuple.set(kmerQueue.get().poll(500, TimeUnit.MILLISECONDS));
+
+                
+				try{
+                	tuple.set(kmerQueue.get().poll(500, TimeUnit.MILLISECONDS));
+                } catch (NullPointerException n) {
+                	return;
+                }
+
 				
                 
 				//System.out.println("Consumed " + gene.getString(2));
@@ -72,13 +78,15 @@ public class Aligner implements Runnable {
 				
 				
 				
-                testBackTrace.set(ConstructArray(target, kmer.get()));
+
+                testBacktrace.set(ConstructArray(target, kmer.get()));
                 if (testBacktrace.get().length == 0 ){
                     System.out.println("Sequence length exceeded maximum. Alignment not computed.");
                     System.out.println();
         
                 // For sequences of acceptable length
                 } else {
+
                     testResult.set(getResult(testBacktrace.get(), target.length(), kmer.get().length(), geneName.get(), i.get()));
                 	
                 	lock.lock();
@@ -148,49 +156,52 @@ public class Aligner implements Runnable {
 		// return emptyArray instead
 		try {
 			
-			int [][] ourArray = new int[sequence1.get().length + 1][sequence2.get().length +1];
-			int [][] backtraceArray = new int[sequence1.get().length + 1][sequence2.get().length +1];
+			ThreadLocal<int [][]> ourArray = new ThreadLocal<int[][]>();
+			ourArray.set(new int[sequence1.get().length + 1][sequence2.get().length +1]);
+			
+			ThreadLocal<int [][]> backtraceArray = new ThreadLocal<int[][]>();
+			backtraceArray.set(new int[sequence1.get().length + 1][sequence2.get().length +1]);
 			
 			for(int i=1; i < sequence1.get().length + 1; i++){
 				for(int j=1; j < sequence2.get().length + 1; j++){
-					int matchMax = Math.max(Math.max(ourArray[i-1][j], ourArray[i][j-1]), 1+ ourArray[i-1][j-1]);
-					int mismatchMax = Math.max(ourArray[i-1][j], ourArray[i][j-1]);
+					int matchMax = Math.max(Math.max(ourArray.get()[i-1][j], ourArray.get()[i][j-1]), 1+ ourArray.get()[i-1][j-1]);
+					int mismatchMax = Math.max(ourArray.get()[i-1][j], ourArray.get()[i][j-1]);
 					// MATCH
 					if(sequence1.get()[i-1] == sequence2.get()[j-1]){
-						ourArray[i][j] = matchMax;
+						ourArray.get()[i][j] = matchMax;
 						
 						//BackTrace
-						if (matchMax == 1+ ourArray[i-1][j-1]){
+						if (matchMax == 1+ ourArray.get()[i-1][j-1]){
 							// 3 = Trace from the diagonal
-							backtraceArray[i][j] = 3;
-						} else if (matchMax == ourArray[i][j-1]) {
+							backtraceArray.get()[i][j] = 3;
+						} else if (matchMax == ourArray.get()[i][j-1]) {
 							// 2 = Trace from the left
 							// AKA Gap in Seq2
-							backtraceArray[i][j] = 2;
+							backtraceArray.get()[i][j] = 2;
 						} else {
 							// 1 = Trace from the top
 							// AKA Gap in Seq1
-							backtraceArray[i][j] = 1;
+							backtraceArray.get()[i][j] = 1;
 						}
 						
 					// MISMATCH
 					} else {
-						ourArray[i][j] = mismatchMax;
+						ourArray.get()[i][j] = mismatchMax;
 						
 						//BackTrace
-						if (matchMax == ourArray[i][j-1]) {
+						if (matchMax == ourArray.get()[i][j-1]) {
 							// 2 = Trace from the left
 							// AKA Gap in Seq2
-							backtraceArray[i][j] = 2;
+							backtraceArray.get()[i][j] = 2;
 						} else {
 							// 1 = Trace from the top
 							// AKA Gap in Seq1
-							backtraceArray[i][j] = 1;
+							backtraceArray.get()[i][j] = 1;
 						}
 					}
 				}
 			}
-			return backtraceArray;
+			return backtraceArray.get();
 			
 		} catch (OutOfMemoryError m) {
 			int [][] emptyArray = new int[0][0];
@@ -198,15 +209,15 @@ public class Aligner implements Runnable {
 		}
 	}
 	
-	public static AlignResult getResult(int[][] backtrace, int i, int j, String gene, int iteration){
+	public static AlignResultConcurrent getResult(int[][] backtrace, int i, int j, String gene, int iteration){
 
 		//Initialize scoring
 		numMatches.set(0);
 		numStartGaps.set(0);
 		numContGaps.set(0);
 		
-		ThreadLocal<LinkedList<Character>> gap1 = new ThreadLocal<LinkedList<Character>>();
-		ThreadLocal<LinkedList<Character>> gap2 = new ThreadLocal<LinkedList<Character>>();
+		ThreadLocal<CharLazyList> gap1 = new ThreadLocal<CharLazyList>();
+		ThreadLocal<CharLazyList> gap2 = new ThreadLocal<CharLazyList>();
 		
 		
 		while(backtrace[i][j] != 0){
@@ -218,8 +229,8 @@ public class Aligner implements Runnable {
 				numMatches.set(numMatches.get()+1);
 				
 				// Create alignment
-				gap1.get().add(0, sequence1.get()[i-1]);
-				gap2.get().add(0, sequence2.get()[j-1]);
+				gap1.get().add(sequence1.get()[i-1]);
+				gap2.get().add(sequence2.get()[j-1]);
 				
 				// Go to next cell
 				i--;
@@ -237,8 +248,8 @@ public class Aligner implements Runnable {
 				}
 				
 				// Create alignment
-				gap1.get().add(0, '-');
-				gap2.get().add(0, sequence2.get()[j-1]);
+				gap1.get().add('-');
+				gap2.get().add(sequence2.get()[j-1]);
 				
 				// Go to next cell
 				j--;
@@ -255,8 +266,8 @@ public class Aligner implements Runnable {
 				}
 				
 				// Create alignment
-				gap1.get().add(0, sequence1.get()[i-1]);
-				gap2.get().add(0, '-');
+				gap1.get().add(sequence1.get()[i-1]);
+				gap2.get().add('-');
 				
 				// Go to next cell
 				i--;
@@ -265,22 +276,22 @@ public class Aligner implements Runnable {
 
 		if (i>0){
 			while (i>0){
-				gap1.get().add(0, sequence1.get()[i-1]);
-				gap2.get().add(0, '-');
+				gap1.get().add(sequence1.get()[i-1]);
+				gap2.get().add('-');
 				i--;
 			}
 		}
 		
 		if (j>0){
 			while (j>0){
-				gap1.get().add(0, '-');
-				gap2.get().add(0, sequence2.get()[j-1]);
+				gap1.get().add('-');
+				gap2.get().add(sequence2.get()[j-1]);
 				j--;
 			}
 		}
 		
 		int finalScore = (numMatches.get()*matchScore) - (numStartGaps.get()*startGapScore) - (numContGaps.get()*continueGapScore);
-		AlignResult result = new AlignResult(gene +" - "+ iteration, gap1.get(), gap2.get(), numMatches.get(), finalScore);
+		AlignResultConcurrent result = new AlignResultConcurrent(gene +" - "+ iteration, gap1.get(), gap2.get(), numMatches.get(), finalScore);
 
 //		System.out.println("FINAL SCORE = " + finalScore);
 //		System.out.println("Aligned Sequence = " + gap1);

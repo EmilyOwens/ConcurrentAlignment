@@ -8,17 +8,17 @@ public class Node {
       public boolean marked;
       private Lock nodeLock = new ReentrantLock();
     
-      public AlignResult data;
+      public AlignResultConcurrent data;
       
       
-      public Node(int item, AlignResult data) {
+      public Node(int item, AlignResultConcurrent item2) {
          this.key = item;
          this.marked = false;
-         this.data = data;
+         this.data = item2;
          
       }
           
-      public AlignResult getData() {
+      public AlignResultConcurrent getData() {
     	  return data;
       }
 
