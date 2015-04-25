@@ -17,7 +17,9 @@ public class Splitter implements Runnable {
 		public Lock printLock = new ReentrantLock();
 		
 		public static InheritableThreadLocal<CleanLazyList> initialResults = new InheritableThreadLocal<CleanLazyList>();
-		
+        public static InheritableThreadLocal<String> geneName = new InheritableThreadLocal<String>();
+        public static ThreadLocal<String> sequence = new ThreadLocal<String>();
+        public static Aligner aligner;
 		
 		public Splitter(BlockingQueue<DbResult> q, String t) {
 			this.queue1 = q;
@@ -28,12 +30,13 @@ public class Splitter implements Runnable {
 		
 		public void run() {
 
-			initialResults.set(new CleanLazyList());
+			
 			try 
 			{
 //				System.out.println(initialResults.get().add(new AlignResult("Test", new LinkedList<Character>(), new LinkedList<Character>(), 0, 7357)));
 				Boolean cont = true;
 				while(cont){
+                    initialResults.set(new CleanLazyList());
 					//System.out.println("Waiting... ");
 					Thread.sleep(10);
 					DbResult gene = queue1.poll(500, TimeUnit.MILLISECONDS);
@@ -46,12 +49,11 @@ public class Splitter implements Runnable {
 						return;
 					}
 					
-					
-					ThreadLocal<String> sequence = new ThreadLocal<String>();
+					//System.out.println("gene.geneName= " +gene.geneName);
                     sequence.set(gene.sequence);
-					ThreadLocal<String> geneName = new ThreadLocal<String>();
                     geneName.set(gene.geneName);
-					
+					//System.out.println("geneName= " +geneName.get());
+
 					queue2 = new LinkedBlockingQueue<KmerTuple>(10*(sequence.get().length() - target.length()));
 					
 					for (int i=0; i < (sequence.get().length() - target.length()); i++)
@@ -66,7 +68,7 @@ public class Splitter implements Runnable {
 	                	
 					}
 		               
-	               Aligner aligner = new Aligner(queue2, target, geneName.get());
+	               aligner = new Aligner(queue2, target);//, geneName.get());
 					
 	               Thread a1 = new Thread(aligner);
 	               Thread a2 = new Thread(aligner);
@@ -78,8 +80,10 @@ public class Splitter implements Runnable {
 	            	   a1.join();
 	            	   a2.join();
 	               } catch (InterruptedException e){}
+                   
 	               printLock.lock();
 		            System.out.println("-----------------");
+                    //System.out.println("geneName= " + geneName.get());
 		            for (int l=1; l <=initialResults.get().size(); l++)
 			           	{  
 			            	   System.out.println(initialResults.get().get(l).geneName + " = " + initialResults.get().get(l).alignmentScore);

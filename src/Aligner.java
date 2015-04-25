@@ -9,7 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Aligner implements Runnable {
 	private BlockingQueue<KmerTuple> kmerQueue;// = new BlockingQueue<KmerTuple>();
 	public String target;
-    public ThreadLocal<String> geneName = new ThreadLocal<String>();
+    //private ThreadLocal<String> geneName;
     
     public Lock lock = new ReentrantLock();
     
@@ -28,13 +28,16 @@ public class Aligner implements Runnable {
 	public static int continueGapScore = 1;
 
 	
-	public Aligner(BlockingQueue<KmerTuple> q, String t, String name) {
+	public Aligner(BlockingQueue<KmerTuple> q, String t){//, String name) {
 		this.kmerQueue = q;
 		this.target = t;
-        this.geneName.set(name);
+
+        //this.geneName = new ThreadLocal<String>();
+        //this.geneName.set(name);
     }
 	
 	public void run() {
+        //System.out.println("Splitter.geneName= " +Splitter.geneName.get());
 
 		
 		try 
@@ -88,8 +91,8 @@ public class Aligner implements Runnable {
         
                 // For sequences of acceptable length
                 } else {
-
-                    testResult.set(getResult(testBacktrace.get(), target.length(), kmer.get().length(), geneName.get(), i.get()));
+                    //System.out.println("Splitter2.geneName= " + Splitter.geneName.get());
+                    testResult.set(getResult(testBacktrace.get(), target.length(), kmer.get().length(), Splitter.geneName.get(), i.get()));
                 	
                 	lock.lock();
                 	if (Splitter.initialResults.get().size() == 0)
@@ -225,6 +228,8 @@ public class Aligner implements Runnable {
 	
 	public static AlignResultConcurrent getResult(int[][] backtrace, int oldI, int oldJ, String gene, int iteration){
 
+       // System.out.println("gene= " +gene);
+
 		ThreadLocal<Integer> i = new ThreadLocal<Integer>();
 		i.set(oldI);
 		ThreadLocal<Integer> j = new ThreadLocal<Integer>();
@@ -315,7 +320,9 @@ public class Aligner implements Runnable {
 		}
 		
 		int finalScore = (numMatches.get()*matchScore) - (numStartGaps.get()*startGapScore) - (numContGaps.get()*continueGapScore);
-		AlignResultConcurrent result = new AlignResultConcurrent(gene +" - "+ iteration, gap1.get(), gap2.get(), numMatches.get(), finalScore);
+        //System.out.println("gene1= " +gene);
+        AlignResultConcurrent result = new AlignResultConcurrent(gene +" - "+ iteration, gap1.get(), gap2.get(), numMatches.get(), finalScore);
+        //System.out.println("gene2= " +gene);
 
 //		System.out.println("FINAL SCORE = " + finalScore);
 //		System.out.println("Aligned Sequence = " + gap1);
