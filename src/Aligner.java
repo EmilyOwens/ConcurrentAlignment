@@ -2,12 +2,17 @@
 //import java.sql.SQLException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Aligner implements Runnable {
 		private BlockingQueue<KmerTuple> kmerQueue;
 		public String target;
         public String geneName;
         public Splitter parent;
+        
+        public Lock lock = new ReentrantLock();
+
 		
 		public Aligner(BlockingQueue<KmerTuple> q, String t, String name, Splitter parent) {
 			this.kmerQueue = q;
@@ -33,37 +38,54 @@ public class Aligner implements Runnable {
 					
 					if(tuple == null)
 					{
-						System.out.println("Aligner done.");
+//						System.out.println("Aligner done.");
 						return;
 					}
 					
                     String kmer = tuple.kMer;
                     int i = tuple.i;
                     
-					System.out.println("Consumed " + geneName+ " "+ i);
+//					System.out.println("Consumed " + geneName+ " "+ i);
 					
 					
 					
 					int[][] testBacktrace = ConcurrentAlignment.ConstructArray(target, kmer);
-		                if (testBacktrace.length == 0 ){
-		                    System.out.println("Sequence length exceeded maximum. Alignment not computed.");
-		                    System.out.println();
-		        
-		                // For sequences of acceptable length
-		                } else {
-		                	AlignResult testResult = ConcurrentAlignment.getResult(testBacktrace, target.length(), kmer.length(), geneName, i);
-		                	
-		                	if (Splitter.initialResults.get().size() == 0)
-		                	{
-		                		Splitter.initialResults.get().add(testResult); 
-		                	}
-		                	else if(testResult.alignmentScore >= Splitter.initialResults.get().get(1).alignmentScore)
-		                	{
-		                		Splitter.initialResults.get().add(testResult);  
-		                	}
-//		                	          
-
-		                }
+	                if (testBacktrace.length == 0 ){
+	                    System.out.println("Sequence length exceeded maximum. Alignment not computed.");
+	                    System.out.println();
+	        
+	                // For sequences of acceptable length
+	                } else {
+	                	AlignResult testResult = ConcurrentAlignment.getResult(testBacktrace, target.length(), kmer.length(), geneName, i);
+	                	
+	                	lock.lock();
+	                	if (Splitter.initialResults.get().size() == 0)
+	                	{
+	                		Splitter.initialResults.get().add(testResult); 
+	                	}
+	                	else if(testResult.alignmentScore >= Splitter.initialResults.get().get(1).alignmentScore)
+	                	{
+	                		Splitter.initialResults.get().add(testResult);  
+	                	}
+	                	int initialBestScore = Splitter.initialResults.get().get(1).alignmentScore;
+	                	lock.unlock();
+	                	
+	                	lock.lock();
+	                	for(int l=1; l <= Splitter.initialResults.get().size(); l++)
+	                	{
+	                		if (Splitter.initialResults.get().get(l).alignmentScore < initialBestScore) 
+	                		{
+	                			Splitter.initialResults.get().remove(Splitter.initialResults.get().get(l));
+	                		}
+	                	}
+	                	lock.unlock();
+	                	
+	                	Splitter.initialResults.get().cleanUp();
+	                	         
+	                }
+		                
+		                
+		                
 				}
 				
 

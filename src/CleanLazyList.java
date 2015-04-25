@@ -141,7 +141,7 @@ public class CleanLazyList {
 		Node pred = head;
 		Node curr = pred.next;
 		
-		while (curr.key != Integer.MAX_VALUE){
+		while (curr.key != Integer.MIN_VALUE){
 			
 			if (curr.marked == true) {
 				pred.next = curr.next;

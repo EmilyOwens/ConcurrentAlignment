@@ -12,7 +12,7 @@ import java.util.concurrent.*;
 public class ConcurrentAlignment {
 	
     private static String dbURL;
-    private static String tableName = "dnaseqs.realtable2";
+    private static String tableName = "dnaseqs.testtable1";//"dnaseqs.realtable2";
     // jdbc Connection
     public static Connection conn = null;
     
