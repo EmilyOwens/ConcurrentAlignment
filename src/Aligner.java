@@ -107,11 +107,14 @@ public class Aligner implements Runnable {
                 	lock.unlock();
                 	
                 	lock.lock();
-                	for(int l=1; l <= Splitter.initialResults.get().size(); l++)
+                    ThreadLocal<Integer> l = new ThreadLocal<Integer>();
+                    
+					
+                	for(l.set(1); l.get() <= Splitter.initialResults.get().size(); l.set(l.get()+1))
                 	{
-                		if (Splitter.initialResults.get().get(l).alignmentScore < initialBestScore.get()) 
+                		if (Splitter.initialResults.get().get(l.get()).alignmentScore < initialBestScore.get()) 
                 		{
-                			Splitter.initialResults.get().remove(Splitter.initialResults.get().get(l));
+                			Splitter.initialResults.get().remove(Splitter.initialResults.get().get(l.get()));
                 		}
                 	}
                 	lock.unlock();
@@ -175,21 +178,23 @@ public class Aligner implements Runnable {
 			
 			for(i.set(1); i.get() < sequence1.get().length + 1; i.set(i.get()+1)){
 				for(j.set(1); j.get() < sequence2.get().length + 1; j.set(j.get()+1)){
-					int matchMax = Math.max(Math.max(ourArray.get()[i.get()-1][j.get()], ourArray.get()[i.get()][j.get()-1]), 1+ ourArray.get()[i.get()-1][j.get()-1]);
-					int mismatchMax = Math.max(ourArray.get()[i.get()-1][j.get()], ourArray.get()[i.get()][j.get()-1]);
+					ThreadLocal<Integer> matchMax = new ThreadLocal<Integer>();
+                    matchMax.set(Math.max(Math.max(ourArray.get()[i.get()-1][j.get()], ourArray.get()[i.get()][j.get()-1]), 1+ ourArray.get()[i.get()-1][j.get()-1]));
+					ThreadLocal<Integer> mismatchMax = new ThreadLocal<Integer>();
+                    mismatchMax.set(Math.max(ourArray.get()[i.get()-1][j.get()], ourArray.get()[i.get()][j.get()-1]));
 					// MATCH
 					if(sequence1.get()[i.get()-1] == sequence2.get()[j.get()-1]){
-						ourArray.get()[i.get()][j.get()] = matchMax;
+						ourArray.get()[i.get()][j.get()] = matchMax.get();
 						
 						//BackTrace
-						if (matchMax == 1+ ourArray.get()[i.get()-1][j.get()-1]){
+						if (matchMax.get() == 1+ ourArray.get()[i.get()-1][j.get()-1]){
 							// 3 = Trace from the diagonal
 //							System.out.println("1st " + backtraceArray.get()[i.get()][j.get()]);
 
 							backtraceArray.get()[i.get()][j.get()] = 3;
 //							System.out.println("2nd " + backtraceArray.get()[i.get()][j.get()]);
 
-						} else if (matchMax == ourArray.get()[i.get()][j.get()-1]) {
+						} else if (matchMax.get() == ourArray.get()[i.get()][j.get()-1]) {
 							// 2 = Trace from the left
 							// AKA Gap in Seq2
 							backtraceArray.get()[i.get()][j.get()] = 2;
@@ -201,10 +206,10 @@ public class Aligner implements Runnable {
 						
 					// MISMATCH
 					} else {
-						ourArray.get()[i.get()][j.get()] = mismatchMax;
+						ourArray.get()[i.get()][j.get()] = mismatchMax.get();
 						
 						//BackTrace
-						if (matchMax == ourArray.get()[i.get()][j.get()-1]) {
+						if (matchMax.get() == ourArray.get()[i.get()][j.get()-1]) {
 							// 2 = Trace from the left
 							// AKA Gap in Seq2
 
@@ -319,14 +324,16 @@ public class Aligner implements Runnable {
 			}
 		}
 		
-		int finalScore = (numMatches.get()*matchScore) - (numStartGaps.get()*startGapScore) - (numContGaps.get()*continueGapScore);
+		ThreadLocal<Integer> finalScore = new ThreadLocal<Integer>();
+        finalScore.set((numMatches.get()*matchScore) - (numStartGaps.get()*startGapScore) - (numContGaps.get()*continueGapScore));
         //System.out.println("gene1= " +gene);
-        AlignResultConcurrent result = new AlignResultConcurrent(gene +" - "+ iteration, gap1.get(), gap2.get(), numMatches.get(), finalScore);
+        ThreadLocal<AlignResultConcurrent> result = new ThreadLocal<AlignResultConcurrent>();
+        result.set(new AlignResultConcurrent(gene +" - "+ iteration, gap1.get(), gap2.get(), numMatches.get(), finalScore.get()));
         //System.out.println("gene2= " +gene);
 
 //		System.out.println("FINAL SCORE = " + finalScore);
 //		System.out.println("Aligned Sequence = " + gap1);
-		return result;
+		return result.get();
 	}
 	
 	
