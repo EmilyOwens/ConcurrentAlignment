@@ -16,7 +16,7 @@ public class CleanLazyList {
 	}
 	
 
-	public void add(AlignResult item) {
+	public void add(AlignResultConcurrent item) {
 		int key = item.alignmentScore;
 
 		while (true) {
@@ -51,7 +51,7 @@ public class CleanLazyList {
 	}
 	
 
-	public void remove(AlignResult item) {
+	public void remove(AlignResultConcurrent item) {
 		int key = item.alignmentScore;
 
 		while (true) {
@@ -96,7 +96,7 @@ public class CleanLazyList {
 		return curr.key == key && !curr.marked;
 	}
 	
-	public AlignResult get(int index) {
+	public AlignResultConcurrent get(int index) {
 		if (index <=0)
 		{
 			return null;
