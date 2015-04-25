@@ -3,9 +3,12 @@
 
 public class CleanLazyList {
 	private Node head;
+    private int size;
+    
 	public CleanLazyList() {
 		head = new Node(Integer.MAX_VALUE, null);
 		head.next = new Node(Integer.MIN_VALUE, null);
+        size = 0;
 	}
 	
 	public boolean validate(Node pred, Node curr){
@@ -34,6 +37,7 @@ public class CleanLazyList {
 							Node node = new Node(item.alignmentScore, item);
 							node.next = curr;
 							pred.next = node;
+                            size++;
 							return;
 						//}
 					}
@@ -68,6 +72,7 @@ public class CleanLazyList {
 							return;
 						} else {
 							curr.marked = true;
+                            size--;
 							//pred.next = curr.next;
 							return;
 						}
@@ -127,6 +132,10 @@ public class CleanLazyList {
 		}
 		
 	}
+    
+    public int size(){
+        return size;
+    }
 	
 	public boolean cleanUp() {
 		Node pred = head;
