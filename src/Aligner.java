@@ -43,7 +43,8 @@ public class Aligner implements Runnable {
 					}
 					
                     String kmer = tuple.kMer;
-                    int i = tuple.i;
+                    ThreadLocal<Integer> i = new ThreadLocal<Integer>();
+                    i.set(tuple.i);
                     
 //					System.out.println("Consumed " + geneName+ " "+ i);
 					
@@ -56,7 +57,7 @@ public class Aligner implements Runnable {
 	        
 	                // For sequences of acceptable length
 	                } else {
-	                	AlignResult testResult = ConcurrentAlignment.getResult(testBacktrace, target.length(), kmer.length(), geneName, i);
+	                	AlignResult testResult = ConcurrentAlignment.getResult(testBacktrace, target.length(), kmer.length(), geneName, i.get());
 	                	
 	                	lock.lock();
 	                	if (Splitter.initialResults.get().size() == 0)

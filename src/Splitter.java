@@ -47,15 +47,17 @@ public class Splitter implements Runnable {
 					}
 					
 					
-					String sequence = gene.sequence;
-					String geneName = gene.geneName;
+					ThreadLocal<String> sequence = new ThreadLocal<String>();
+                    sequence.set(gene.sequence);
+					ThreadLocal<String> geneName = new ThreadLocal<String>();
+                    geneName.set(gene.geneName);
 					
-					queue2 = new LinkedBlockingQueue<KmerTuple>(10*(sequence.length() - target.length()));
+					queue2 = new LinkedBlockingQueue<KmerTuple>(10*(sequence.get().length() - target.length()));
 					
-					for (int i=0; i < (sequence.length() - target.length()); i++)
+					for (int i=0; i < (sequence.get().length() - target.length()); i++)
 					{
 //						System.out.println("Step " + i + " of " + (sequence.length() - target.length()));
-	                	String kMer = sequence.substring(i, i+target.length());
+	                	String kMer = sequence.get().substring(i, i+target.length());
 	                	
 	                	KmerTuple ourKMer = new KmerTuple(kMer, i);
 	                	
@@ -64,7 +66,7 @@ public class Splitter implements Runnable {
 	                	
 					}
 		               
-	               Aligner aligner = new Aligner(queue2, target, geneName, this);
+	               Aligner aligner = new Aligner(queue2, target, geneName.get(), this);
 					
 	               Thread a1 = new Thread(aligner);
 	               Thread a2 = new Thread(aligner);
@@ -85,6 +87,7 @@ public class Splitter implements Runnable {
 		            System.out.println("-----------------");
 		            printLock.unlock();
 	               
+
 	            
 //		               System.out.println("Consumed " + gene.geneName);
 
