@@ -42,15 +42,6 @@ public class Splitter implements Runnable {
 					
 					if(gene == null)
 					{
-						printLock.lock();
-			            System.out.println("-----------------");
-			            for (int l=1; l <=initialResults.get().size(); l++)
-				           	{  
-				            	   System.out.println(initialResults.get().get(l).geneName + " = " + initialResults.get().get(l).alignmentScore);
-				           	}
-			            System.out.println("-----------------");
-			            printLock.unlock();
-
 						System.out.println("Done.");
 						return;
 					}
@@ -85,6 +76,14 @@ public class Splitter implements Runnable {
 	            	   a1.join();
 	            	   a2.join();
 	               } catch (InterruptedException e){}
+	               printLock.lock();
+		            System.out.println("-----------------");
+		            for (int l=1; l <=initialResults.get().size(); l++)
+			           	{  
+			            	   System.out.println(initialResults.get().get(l).geneName + " = " + initialResults.get().get(l).alignmentScore);
+			           	}
+		            System.out.println("-----------------");
+		            printLock.unlock();
 	               
 	            
 //		               System.out.println("Consumed " + gene.geneName);
