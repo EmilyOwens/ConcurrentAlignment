@@ -393,7 +393,7 @@ public class SequentialAlignment {
             			finalResults.add(initialResults.get(j));
             		} else {
             			int finalBestScore = finalResults.get(0).alignmentScore;
-            			if (initialResults.get(j).alignmentScore >= finalBestScore)
+            			if (initialResults.get(j).alignmentScore >= finalBestScore - 2)
             			{
             				finalResults.add(0, initialResults.get(j));
             			}
@@ -401,12 +401,19 @@ public class SequentialAlignment {
             	}
             	
             	initialResults = null;
+            	int finalBestScore = 0;
+            	for (int m=0; m < finalResults.size(); m++)
+            	{
+            		if (finalResults.get(m).alignmentScore > finalBestScore)
+            		{
+               		 	finalBestScore = finalResults.get(0).alignmentScore;
+            		}
+            	}
             	
-            	int finalBestScore = finalResults.get(0).alignmentScore;
             	
             	for (int l=0; l < finalResults.size(); l++)
             	{
-            		if (finalResults.get(l).alignmentScore < finalBestScore)
+            		if (finalResults.get(l).alignmentScore < finalBestScore - 2)
             		{
             			finalResults.remove(l);
             			l--;
@@ -418,7 +425,7 @@ public class SequentialAlignment {
             
             for (int l=0; l < finalResults.size(); l++)
         	{
-//        		System.out.println( l +" "+ finalResults.get(l).geneName + " = " + finalResults.get(l).alignmentScore);
+        		System.out.println( l +" "+ finalResults.get(l).geneName + " = " + finalResults.get(l).alignmentScore);
         	}
             
 //            System.out.println("--------------------");
