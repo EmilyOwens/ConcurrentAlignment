@@ -258,6 +258,10 @@ public class SequentialAlignment {
 	
 	public static void main(String[] args){
 		
+        
+        long startTime = System.nanoTime();
+        
+        
 		// Connect to db
 		// Specify OS to distinguish between Emily's and Josh's Machines
         String os = System.getProperty("os.name");
@@ -446,6 +450,11 @@ public class SequentialAlignment {
         } 
 		
 		shutdown();
+        
+        
+        
+        long endTime = System.nanoTime();
+        System.out.println("That took " + (endTime - startTime)/1000000 + " milliseconds");
 	}
 	
 	// DB connection stuff

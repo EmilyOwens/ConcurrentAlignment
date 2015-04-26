@@ -38,6 +38,11 @@ public class ConcurrentAlignment {
 	
 	public static void main(String[] args){
 		
+        
+        long startTime = System.nanoTime();
+
+
+
         String os = System.getProperty("os.name");
         if (os.startsWith("Linux")){
             dbURL = "jdbc:derby:../MyDB;";
@@ -118,6 +123,13 @@ public class ConcurrentAlignment {
         }
         
 		shutdown();
+        
+        
+        long endTime = System.nanoTime();
+        System.out.println("That took " + (endTime - startTime)/1000000 + " milliseconds");
+        
+        
+        
 	}
 	private static void createConnection()
     {
