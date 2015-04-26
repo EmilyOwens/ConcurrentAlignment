@@ -76,6 +76,14 @@ public class ConcurrentAlignment {
 	        	c2.join();
 	        } catch(InterruptedException e) {}
 	        
+            
+
+            for (int i = 1; i <= finalResults.size(); i++)
+            {
+                System.out.println( i +" "+ finalResults.get(i).geneName + " = " + finalResults.get(i).alignmentScore);
+            }
+                    
+                    
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}

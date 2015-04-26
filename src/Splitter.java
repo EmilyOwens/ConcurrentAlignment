@@ -85,17 +85,49 @@ public class Splitter implements Runnable {
 	            	   a2.join();
 	               } catch (InterruptedException e){}
                    
-	               printLock.lock();
-		            System.out.println("-----------------");
-                    //System.out.println("geneName= " + geneName.get());
-		            for (int l=1; l <=initialResults.get().size(); l++)
-			           	{  
-			            	   System.out.println(initialResults.get().get(l).geneName + " = " + initialResults.get().get(l).alignmentScore);
-			           	}
-		            System.out.println("-----------------");
-		            printLock.unlock();
+	               //printLock.lock();
+		           // System.out.println("-----------------");
+                   // //System.out.println("geneName= " + geneName.get());
+		           // for (int l=1; l <=initialResults.get().size(); l++)
+			       //    	{  
+			       //     	   System.out.println(initialResults.get().get(l).geneName + " = " + initialResults.get().get(l).alignmentScore);
+			       //    	}
+		           // System.out.println("-----------------");
+		           // printLock.unlock();
+                   // 
+                    ThreadLocal<Integer> j = new ThreadLocal<Integer>();
+                    ThreadLocal<Integer> k = new ThreadLocal<Integer>();
+                    
+                    for (j.set(1); j.get() <= initialResults.get().size(); j.set(j.get()+1))
+                    {
+                        if (ConcurrentAlignment.finalResults.size() == 0)
+                        {
+                            ConcurrentAlignment.finalResults.add(initialResults.get().get(j.get()));
+                        } else {
+                            ThreadLocal<Integer> finalBestScore = new ThreadLocal<Integer>();
+                            finalBestScore.set(ConcurrentAlignment.finalResults.get(1).alignmentScore);
+                            if (initialResults.get().get(j.get()).alignmentScore >= finalBestScore.get()-2)
+                            {
+                                ConcurrentAlignment.finalResults.add(initialResults.get().get(j.get()));
+                            }
+                        }
+                    }
+            	
+                    initialResults.set(null);
+                    
+                    ThreadLocal<Integer> finalBestScore = new ThreadLocal<Integer>();
+                    finalBestScore.set(ConcurrentAlignment.finalResults.get(1).alignmentScore);
+                    
+                    for (k.set(1); k.get() <= ConcurrentAlignment.finalResults.size(); k.set(k.get()+1))
+                    {
+                        if (ConcurrentAlignment.finalResults.get(k.get()).alignmentScore < finalBestScore.get()-2)
+                        {
+                            ConcurrentAlignment.finalResults.remove(ConcurrentAlignment.finalResults.get(k.get()));
+                            k.set(k.get()-1);
+                        }
+                    }
 	               
-
+               
 	            
 //		               System.out.println("Consumed " + gene.geneName);
 
