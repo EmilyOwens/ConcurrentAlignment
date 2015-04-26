@@ -111,7 +111,7 @@ public class Aligner implements Runnable {
 //                    ThreadLocal<Integer> l = new ThreadLocal<Integer>();
                     
 					
-                	for(int l=1; l < Splitter.initialResults.get().size()+1; l++)
+                	for(int l=1; l < Splitter.initialResults.get().size(); l++)
                 	{
             			if (Splitter.initialResults.get().get(l).alignmentScore < initialBestScore.get()) 
                 		{
