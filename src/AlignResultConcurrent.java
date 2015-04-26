@@ -16,4 +16,8 @@ public class AlignResultConcurrent {
 		this.alignmentScore = alignmentScore;
 	}
 	
+	public AlignResultConcurrent() {
+		this.alignmentScore = Integer.MIN_VALUE;
+	}
+	
 }

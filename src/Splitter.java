@@ -76,13 +76,31 @@ public class Splitter implements Runnable {
 					
 	               Thread a1 = new Thread(new Aligner(queue2, target));
 	               Thread a2 = new Thread(new Aligner(queue2, target));
+	               Thread a3 = new Thread(new Aligner(queue2, target));
+	               Thread a4 = new Thread(new Aligner(queue2, target));
+	               Thread a5 = new Thread(new Aligner(queue2, target));
+	               Thread a6 = new Thread(new Aligner(queue2, target));
+	               Thread a7 = new Thread(new Aligner(queue2, target));
+	               Thread a8 = new Thread(new Aligner(queue2, target));
 	               
 	               a1.start();
 	               a2.start();
+	               a3.start();
+	               a4.start();
+	               a5.start();
+	               a6.start();
+	               a7.start();
+	               a8.start();
 	               
 	               try {
 	            	   a1.join();
 	            	   a2.join();
+	            	   a3.join();
+	            	   a4.join();
+	            	   a5.join();
+	            	   a6.join();
+	            	   a7.join();
+	            	   a8.join();
 	               } catch (InterruptedException e){}
                    
 	               //printLock.lock();
@@ -113,7 +131,7 @@ public class Splitter implements Runnable {
                         }
                     }
             	
-                    initialResults.set(null);
+//                    initialResults.set(null);
                     
                     ThreadLocal<Integer> finalBestScore = new ThreadLocal<Integer>();
                     finalBestScore.set(ConcurrentAlignment.finalResults.get(1).alignmentScore);

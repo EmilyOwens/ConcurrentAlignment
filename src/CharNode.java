@@ -6,15 +6,15 @@ public class CharNode {
       public char key;
       public CharNode next;
       public boolean marked;
-      private Lock nodeLock;// = new ReentrantLock();
+      private Lock nodeLock = new ReentrantLock();
     
       
       
       public CharNode(char item) {
          this.key = item;
          this.marked = false;
-         this.next = null;
-         this.nodeLock = new ReentrantLock();
+//         this.next = null;
+//         this.nodeLock = new ReentrantLock();
          
       }
           

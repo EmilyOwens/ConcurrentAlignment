@@ -376,13 +376,13 @@ public class SequentialAlignment {
                 	
                 }
                 
-                System.out.println("--------------------");
-            	for (int l=0; l < initialResults.size(); l++)
-            	{
-            		System.out.println( l +" "+ initialResults.get(l).geneName + " = " + initialResults.get(l).alignmentScore);
-            	}
-                
-                System.out.println("--------------------");
+//                System.out.println("--------------------");
+//            	for (int l=0; l < initialResults.size(); l++)
+//            	{
+//            		System.out.println( l +" "+ initialResults.get(l).geneName + " = " + initialResults.get(l).alignmentScore);
+//            	}
+//                
+//                System.out.println("--------------------");
                 
                 // finalResults ---> The best alignment scores when considering every gene in db
                 // If the scores of initialResults are >= the highest score in finalResults,
@@ -427,10 +427,10 @@ public class SequentialAlignment {
             }
             
             
-            for (int l=0; l < finalResults.size(); l++)
-        	{
-        		System.out.println( l +" "+ finalResults.get(l).geneName + " = " + finalResults.get(l).alignmentScore);
-        	}
+//            for (int l=0; l < finalResults.size(); l++)
+//        	{
+//        		System.out.println( l +" "+ finalResults.get(l).geneName + " = " + finalResults.get(l).alignmentScore);
+//        	}
             
 //            System.out.println("--------------------");
             

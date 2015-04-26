@@ -6,8 +6,9 @@ public class CleanLazyList {
     private int size;
     
 	public CleanLazyList() {
-		head = new Node(Integer.MAX_VALUE, null);
-		head.next = new Node(Integer.MIN_VALUE, null);
+		AlignResultConcurrent junk = new AlignResultConcurrent();
+		head = new Node(Integer.MAX_VALUE, junk);
+		head.next = new Node(Integer.MIN_VALUE, junk);
         size = 0;
 	}
 	
@@ -99,7 +100,8 @@ public class CleanLazyList {
 	public AlignResultConcurrent get(int index) {
 		if (index <=0)
 		{
-			return null;
+			AlignResultConcurrent junk = new AlignResultConcurrent();
+			return junk;
 		}
 		int i = 1;
 		

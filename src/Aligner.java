@@ -48,6 +48,7 @@ public class Aligner implements Runnable {
             ThreadLocal<int[][]> testBacktrace = new ThreadLocal<int[][]>();
             ThreadLocal<AlignResultConcurrent> testResult = new ThreadLocal<AlignResultConcurrent>();
             ThreadLocal<Integer> initialBestScore = new ThreadLocal<Integer>();
+            initialBestScore.set(0);
 
 //				parent.initialResults.set(parent.initialResults.get());
 			Boolean cont = true;
@@ -107,19 +108,22 @@ public class Aligner implements Runnable {
                 	lock.unlock();
                 	
                 	lock.lock();
-                    ThreadLocal<Integer> l = new ThreadLocal<Integer>();
+//                    ThreadLocal<Integer> l = new ThreadLocal<Integer>();
                     
 					
-                	for(l.set(1); l.get() <= Splitter.initialResults.get().size(); l.set(l.get()+1))
+                	for(int l=1; l < Splitter.initialResults.get().size()+1; l++)
                 	{
-                		if (Splitter.initialResults.get().get(l.get()).alignmentScore < initialBestScore.get()) 
+            			if (Splitter.initialResults.get().get(l).alignmentScore < initialBestScore.get()) 
                 		{
-                			Splitter.initialResults.get().remove(Splitter.initialResults.get().get(l.get()));
-                		}
+                		
+        					Splitter.initialResults.get().remove(Splitter.initialResults.get().get(l));
+        					l--;
+                		}	
+
                 	}
                 	lock.unlock();
                 	
-                	//Splitter.initialResults.get().cleanUp();
+                	Splitter.initialResults.get().cleanUp();
                 	         
                 }
 	                
