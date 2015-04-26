@@ -18,12 +18,13 @@ public class Producer implements Runnable {
 		
 		@Override
 		public void run() {
+			long startTime = System.nanoTime();
 			try{
 				ConcurrentAlignment.lock.lock();
 	            Boolean next = results.next();
 	            ConcurrentAlignment.lock.unlock();
 	            int index = 0;
-	            while(next && results.getInt(1) < 25 ){
+	            while(next && results.getInt(1) < 25){
 //	            
 	                try {
 	                	Thread.sleep(5);
@@ -31,7 +32,7 @@ public class Producer implements Runnable {
 	                	DbResult ourResult = new DbResult(results.getInt(1), results.getString(2), results.getString(3));
 	                	producerArray[index] = ourResult;
 //	                	System.out.println(producerArray[0].getString(2));
-//	                	System.out.println("Start Produce "+results.getString(2));
+	                	System.out.println("Start Produce "+results.getString(2));
 //	                	queue1.put(results);
 //	                	System.out.println("End Produce "+results.getString(2));
 	                } catch (InterruptedException e) { }
@@ -62,6 +63,10 @@ public class Producer implements Runnable {
 	        catch (SQLException sqlExcept){
 	            sqlExcept.printStackTrace();
 	        }
+			
+			long endTime = System.nanoTime();
+	        System.out.println("Producer took " + (endTime - startTime)/1000000 + " milliseconds");
+			
 		}
 		
 	}
