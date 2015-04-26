@@ -46,7 +46,7 @@ public class Splitter implements Runnable {
 					
 					if(gene.get() == null)
 					{
-						System.out.println("Done.");
+//						System.out.println("Done.");
 						return;
 					}
 					
