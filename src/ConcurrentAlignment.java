@@ -75,25 +75,25 @@ public class ConcurrentAlignment {
 	        
 	        Thread p1 = new Thread(producer);
 //	        Thread p2 = new Thread(producer);
-	        Thread c1 = new Thread(new Splitter(queue1, target));
-	        Thread c2 = new Thread(new Splitter(queue1, target));
-	        Thread c3 = new Thread(new Splitter(queue1, target));
-	        Thread c4 = new Thread(new Splitter(queue1, target));
+	        Thread s1 = new Thread(new Splitter(queue1, target));
+	        Thread s2 = new Thread(new Splitter(queue1, target));
+	        Thread s3 = new Thread(new Splitter(queue1, target));
+	        Thread s4 = new Thread(new Splitter(queue1, target));
 	        
 	        p1.start();
 //	        p2.start();
-	        c1.start();
-	        c2.start();
-	        c3.start();
-	        c4.start();
+	        s1.start();
+	        s2.start();
+	        s3.start();
+	        s4.start();
 	        
 	        try{
 	        	p1.join();
 //	        	p2.join();
-	        	c1.join();
-	        	c2.join();
-	        	c3.join();
-	        	c4.join();
+	        	s1.join();
+	        	s2.join();
+	        	s3.join();
+	        	s4.join();
 	        } catch(InterruptedException e) {}
 	        
             
