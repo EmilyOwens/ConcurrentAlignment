@@ -57,7 +57,7 @@ public class Splitter implements Runnable {
                     geneName.set(gene.get().geneName);
 					//System.out.println("geneName= " +geneName.get());
 
-					queue2 = new LinkedBlockingQueue<KmerTuple>(10*(sequence.get().length() - target.length()));
+					queue2 = new LinkedBlockingQueue<KmerTuple>((sequence.get().length() - target.length())+2);
 					ThreadLocal<Integer> i = new ThreadLocal<Integer>();
                     
 					for (i.set(0); i.get() < (sequence.get().length() - target.length()); i.set(i.get()+1))
@@ -73,6 +73,7 @@ public class Splitter implements Runnable {
 //	                	System.out.println("Got here");
 	                	
 					}
+					
 		               
 	               //aligner = new Aligner(queue2, target);//, geneName.get());
 					
@@ -84,7 +85,7 @@ public class Splitter implements Runnable {
 //	               Thread a6 = new Thread(new Aligner(queue2, target));
 //	               Thread a7 = new Thread(new Aligner(queue2, target));
 //	               Thread a8 = new Thread(new Aligner(queue2, target));
-//	               
+	               
 	               a1.start();
 	               a2.start();
 	               a3.start();
@@ -124,21 +125,21 @@ public class Splitter implements Runnable {
                         {
                             ConcurrentAlignment.finalResults.add(initialResults.get().get(j.get()));
                         } else {
-                            ThreadLocal<Integer> finalBestScore = new ThreadLocal<Integer>();
-                            finalBestScore.set(ConcurrentAlignment.finalResults.get(1).alignmentScore);
-                            if (initialResults.get().get(j.get()).alignmentScore >= finalBestScore.get()-2)
-                            {
+//                            ThreadLocal<Integer> finalBestScore = new ThreadLocal<Integer>();
+//                            finalBestScore.set(ConcurrentAlignment.finalResults.get(1).alignmentScore);
+//                            if (initialResults.get().get(j.get()).alignmentScore >= finalBestScore.get()-2)
+//                            {
                                 ConcurrentAlignment.finalResults.add(initialResults.get().get(j.get()));
-                            }
+//                            }
                         }
                     }
             	
-//                    initialResults.set(null);
+                    initialResults.remove();
                     
                     ThreadLocal<Integer> finalBestScore = new ThreadLocal<Integer>();
                     finalBestScore.set(ConcurrentAlignment.finalResults.get(1).alignmentScore);
                     
-                    for (k.set(1); k.get() <= ConcurrentAlignment.finalResults.size(); k.set(k.get()+1))
+                    for (k.set(1); k.get() <= ConcurrentAlignment.finalResults.size.get(); k.set(k.get()+1))
                     {
                         if (ConcurrentAlignment.finalResults.get(k.get()).alignmentScore < finalBestScore.get()-2)
                         {

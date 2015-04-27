@@ -24,7 +24,7 @@ public class Producer implements Runnable {
 	            Boolean next = results.next();
 	            ConcurrentAlignment.lock.unlock();
 	            int index = 0;
-	            while(next && results.getInt(1) < 25){
+	            while(next && results.getInt(1) < 26){
 //	            
 	                try {
 	                	Thread.sleep(5);
@@ -46,7 +46,7 @@ public class Producer implements Runnable {
 	            }
 
 	            	
-	            for (int i=0; i<25; i++)
+	            for (int i=0; i<26; i++)
 	            {
 	            	try {
 	            		//System.out.println("Should Produce "+producerArray[i].geneName);

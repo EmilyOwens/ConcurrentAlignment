@@ -16,8 +16,32 @@ public class AlignResultConcurrent {
 		this.alignmentScore = alignmentScore;
 	}
 	
-	public AlignResultConcurrent() {
-		this.alignmentScore = Integer.MIN_VALUE;
+	public AlignResultConcurrent(String nodeName) {
+		if (nodeName == "HEAD")
+		{
+			this.geneName = "NOTHING";
+			this.seq1 = new CharLazyList();
+			this.seq2 = new CharLazyList();
+			this.numNtMatches = Integer.MIN_VALUE;
+			this.numNtMatches = Integer.MIN_VALUE;
+		} else if (nodeName == "TAIL") {
+			
+			this.geneName = "NOTHING";
+			this.seq1 = new CharLazyList();
+			this.seq2 = new CharLazyList();
+			this.numNtMatches = Integer.MIN_VALUE;
+			this.numNtMatches = Integer.MIN_VALUE;
+			
+		} else {
+			this.geneName = "NOTHING";
+			this.seq1 = new CharLazyList();
+			this.seq2 = new CharLazyList();
+			this.numNtMatches = Integer.MIN_VALUE;
+			this.numNtMatches = Integer.MIN_VALUE;
+		}
+
 	}
+	
+
 	
 }

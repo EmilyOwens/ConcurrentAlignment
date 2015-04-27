@@ -1,15 +1,20 @@
+import java.util.concurrent.atomic.AtomicInteger;
+
 //import java.util.concurrent.locks.Lock;
 //import java.util.concurrent.locks.ReentrantLock;
 
 public class CleanLazyList {
 	private Node head;
-    private int size;
+    public AtomicInteger size = new AtomicInteger(0);
+    
+    public ThreadLocal<Integer> topScore = new ThreadLocal<Integer>();
+    
     
 	public CleanLazyList() {
-		AlignResultConcurrent junk = new AlignResultConcurrent();
-		head = new Node(Integer.MAX_VALUE, junk);
-		head.next = new Node(Integer.MIN_VALUE, junk);
-        size = 0;
+		AlignResultConcurrent junkHead = new AlignResultConcurrent("HEAD");
+		AlignResultConcurrent junkTail = new AlignResultConcurrent("TAIL");
+		head = new Node(Integer.MAX_VALUE, junkHead);
+		head.next = new Node(Integer.MIN_VALUE, junkTail);
 	}
 	
 	public boolean validate(Node pred, Node curr){
@@ -17,7 +22,7 @@ public class CleanLazyList {
 	}
 	
 
-	public void add(AlignResultConcurrent item) {
+	public boolean add(AlignResultConcurrent item) {
 		int key = item.alignmentScore;
 
 		while (true) {
@@ -38,8 +43,8 @@ public class CleanLazyList {
 							Node node = new Node(item.alignmentScore, item);
 							node.next = curr;
 							pred.next = node;
-                            size++;
-							return;
+                            size.getAndIncrement();
+							return true;
 						//}
 					}
 				} finally {
@@ -52,30 +57,30 @@ public class CleanLazyList {
 	}
 	
 
-	public void remove(AlignResultConcurrent item) {
+	public boolean remove(AlignResultConcurrent item) {
 		int key = item.alignmentScore;
 
 		while (true) {
 			Node pred = head;
 			Node curr = head.next;
-			while (curr.key > key){
+			while (curr.key > key && curr.next != null){
 				pred = curr;
 				curr = curr.next;
 			}
 			pred.lock();
-			
-			
+
 			try {
 				curr.lock();
 				try {
 					if (validate(pred, curr)){
 						if (curr.key != key){
-							return;
+							
+							return false;
 						} else {
 							curr.marked = true;
-                            size--;
+                            size.getAndDecrement();
 							pred.next = curr.next;
-							return;
+							return true;
 						}
 					}
 				} finally {
@@ -88,6 +93,7 @@ public class CleanLazyList {
                 
 	}
 	
+	
 	public boolean contains(AlignResult item) {
 		int key = item.hashCode();
 		Node curr = head;
@@ -98,22 +104,25 @@ public class CleanLazyList {
 	}
 	
 	public AlignResultConcurrent get(int index) {
+		
+		
 		if (index <=0)
 		{
-			AlignResultConcurrent junk = new AlignResultConcurrent();
+			AlignResultConcurrent junk = new AlignResultConcurrent("NOTHING");
 			return junk;
 		}
-		int i = 1;
+		AtomicInteger i = new AtomicInteger(1);
 		
 		while(true) {
 			Node pred = head;
 			Node curr = head.next;
 			
-			while(i < index)
+			while(i.get() < index && curr.next != null)
 			{
 				pred = curr;
 				curr = curr.next;
-				i++;
+				i.getAndIncrement();
+//				System.out.println(i.get());
 			}
 			
 			pred.lock();
@@ -131,12 +140,14 @@ public class CleanLazyList {
 			} finally {
 				pred.unlock();
 			}
+			
 		}
+		
 		
 	}
     
     public int size(){
-        return size;
+        return size.get();
         }
 	
 	public boolean cleanUp() {
@@ -146,7 +157,17 @@ public class CleanLazyList {
 		while (curr.key != Integer.MIN_VALUE){
 			
 			if (curr.marked == true) {
-				pred.next = curr.next;
+				pred.lock();
+				try {
+					curr.lock();
+					try{
+						curr.next.lock();
+						try {
+							pred.next = curr.next;
+						} finally {curr.next.unlock();}
+					}finally {curr.unlock();}
+				}finally {pred.unlock();}
+					
 			}
 			
 			pred = curr;

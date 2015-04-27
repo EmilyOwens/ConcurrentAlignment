@@ -3,16 +3,14 @@
 //import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+//import java.util.concurrent.locks.Lock;
+//import java.util.concurrent.locks.ReentrantLock;
 
 public class Aligner implements Runnable {
 	private BlockingQueue<KmerTuple> kmerQueue;// = new BlockingQueue<KmerTuple>();
 	public String target;
     //private ThreadLocal<String> geneName;
-    
-    public Lock lock = new ReentrantLock();
-    
+     
     
 	// Original input sequences
 	public static ThreadLocal<char[]> sequence1 = new ThreadLocal<char[]>();
@@ -59,7 +57,7 @@ public class Aligner implements Runnable {
                 
 				try{
 //					System.out.println(kmerQueue);
-                	tuple.set(kmerQueue.poll(50, TimeUnit.MILLISECONDS));
+                	tuple.set(kmerQueue.poll(1, TimeUnit.MILLISECONDS));
                 } catch (NullPointerException n) {
                 	
                 	return;
@@ -79,11 +77,7 @@ public class Aligner implements Runnable {
                 kmer.set(tuple.get().kMer);
                 
                 i.set(tuple.get().i);
-                
-//					System.out.println("Consumed " + geneName+ " "+ i);
-				
-				
-				
+
 
                 testBacktrace.set(ConstructArray(target, kmer.get()));
                 if (testBacktrace.get().length == 0 ){
@@ -95,8 +89,7 @@ public class Aligner implements Runnable {
                     //System.out.println("Splitter2.geneName= " + Splitter.geneName.get());
                     testResult.set(getResult(testBacktrace.get(), target.length(), kmer.get().length(), Splitter.geneName.get(), i.get()));
                 	
-//                	lock.lock();
-                	if (Splitter.initialResults.get().size() == 0)
+                	if (Splitter.initialResults.get().size.get() == 0)
                 	{
 //                    	long startTime = System.nanoTime();
                 		Splitter.initialResults.get().add(testResult.get()); 
@@ -108,27 +101,26 @@ public class Aligner implements Runnable {
                 		Splitter.initialResults.get().add(testResult.get());  
                 	}
                     initialBestScore.set(Splitter.initialResults.get().get(1).alignmentScore);
-//                	lock.unlock();
-//                	
-//                	lock.lock();
+////                	
 //                    ThreadLocal<Integer> l = new ThreadLocal<Integer>();
                     
 //                	long startTime = System.nanoTime();
 
-                    
-                	for(int l=1; l < Splitter.initialResults.get().size(); l++)
+                    ThreadLocal<Integer> l = new ThreadLocal<Integer>();
+
+                	for(l.set(1); l.get() < Splitter.initialResults.get().size(); l.set(l.get()+1))
                 	{
-            			if (Splitter.initialResults.get().get(l).alignmentScore < initialBestScore.get()) 
+                		
+            			if (Splitter.initialResults.get().get(l.get()).alignmentScore < initialBestScore.get()) 
                 		{
                 		
-        					Splitter.initialResults.get().remove(Splitter.initialResults.get().get(l));
-        					l--;
+        					Splitter.initialResults.get().remove(Splitter.initialResults.get().get(l.get()));
+        					l.set(l.get()-1);
                 		}	
 
                 	}
 //                	long endTime = System.nanoTime();
 //                    System.out.println("Removing from initialResults took " + (endTime - startTime)/1000000 + " milliseconds");
-//                	lock.unlock();
                 	
 //                	Splitter.initialResults.get().cleanUp();
                 	         
@@ -240,6 +232,8 @@ public class Aligner implements Runnable {
 					}
 				}
 			}
+			
+			ourArray = null;
 //			i.set(null);
 //			j.set(null);
 //			long endTime = System.nanoTime();
@@ -330,6 +324,8 @@ public class Aligner implements Runnable {
 				i--;
 			}
 		}
+		
+		backtrace = null;
 
 		if (i>0){
 			while (i>0){
@@ -353,6 +349,9 @@ public class Aligner implements Runnable {
         ThreadLocal<AlignResultConcurrent> result = new ThreadLocal<AlignResultConcurrent>();
         result.set(new AlignResultConcurrent(gene +" - "+ iteration, gap1.get(), gap2.get(), numMatches, finalScore));
         //System.out.println("gene2= " +gene);
+        
+//        gap1.remove();
+//        gap2.remove();
         
 //        finalScore.set(null);
 //        i.set(null);
